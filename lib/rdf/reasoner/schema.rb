@@ -55,5 +55,5 @@ module RDF::Reasoner
   end
 
   # Extend the Term with this methods
-  ::RDF::Vocabulary::Term.include SCHEMA
+  ::RDF::Vocabulary::Term.send(:include, SCHEMA)
 end
