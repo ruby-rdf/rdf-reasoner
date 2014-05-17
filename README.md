@@ -1,6 +1,9 @@
-# rdf-entailment
+# rdf-reasoner
 
-Creates triples for various entailment regimes of a vocabulary for enabling SPARQL 1.1 Entailment.
+Reasons over RDFS/OWL vocabularies to generate statements which are entailed
+based on base RDFS/OWL rules along with vocabulary information. It can also be
+used to ask specific questions, such as if a given object is consistent with
+the vocabulary ruleset. This can be used to implement [SPARQL Entailment][] Regimes.
 
 ## Features
 
@@ -54,7 +57,7 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
 [SPARQL]:           http://en.wikipedia.org/wiki/SPARQL
 [SPARQL Query]:     http://www.w3.org/TR/2013/REC-sparql11-query-20130321/
-[SPARQL Entailment]:http://www.w3.org/TR/2013/REC-sparql11-entailment-20130321/
+[SPARQL Entailment]:http://www.w3.org/TR/2013/REC-sparql11-reasoner-20130321/
 [RDF 1.1]:          http://www.w3.org/TR/rdf11-concepts
 [RDF.rb]:           http://rdf.rubyforge.org/
 [Rack]:             http://rack.rubyforge.org/
