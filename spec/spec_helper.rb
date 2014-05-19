@@ -4,6 +4,7 @@ $:.unshift File.dirname(__FILE__)
 require "bundler/setup"
 require 'rspec'
 require 'rdf/reasoner'
+require 'rdf/turtle'
 require 'rdf/xsd'
 
 ::RSpec.configure do |c|

@@ -26,14 +26,30 @@ class RDF::Vocabulary::Term
   ##
   # Determine if the domain of a property term is consistent with the specified resource in `queryable`.
   #
+  # @param [RDF::Resource] resource
+  # @param [RDF::Queryable] queryable
+  # @param [Hash{Symbol => Object}] options ({})
+  # @option options [Array<RDF::Vocabulary::Term>] :types
+  #   Fully entailed types of resource, if not provided, they are queried
+  def domain_compatible?(resource, queryable, options = {})
+    %w(owl rdfs schema).map {|r| "domain_compatible_#{r}?".to_sym}.all? do |meth|
+      !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
+    end
+  end
+
+  ##
+  # Determine if the range of a property term is consistent with the specified resource in `queryable`.
+  #
   # Specific entailment regimes should insert themselves before this to apply the appropriate semantic condition
   #
   # @param [RDF::Resource] resource
   # @param [RDF::Queryable] queryable
-  def domain_acceptable?(resource, queryable, options = {})
-    true &&
-    (!respond_to?(:domain_acceptable_owl?)    || domain_acceptable_owl?(resource, queryable, options)) &&
-    (!respond_to?(:domain_acceptable_rdfs?)   || domain_acceptable_rdfs?(resource, queryable, options)) &&
-    (!respond_to?(:domain_acceptable_schema?) || domain_acceptable_schema?(resource, queryable, options))
+  # @param [Hash{Symbol => Object}] options ({})
+  # @option options [Array<RDF::Vocabulary::Term>] :types
+  #   Fully entailed types of resource, if not provided, they are queried
+  def range_compatible?(resource, queryable, options = {})
+    %w(owl rdfs schema).map {|r| "range_compatible_#{r}?".to_sym}.all? do |meth|
+      !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
+    end
   end
 end
