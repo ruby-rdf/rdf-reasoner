@@ -15,9 +15,9 @@ module RDF
     ##
     # Add entailment support for the specified regime
     #
-    # @param [:OWL, :RDFS, :SCHEMA] regime
-    def apply(regime)
-      require "rdf/reasoner/#{regime.downcase}"
+    # @param [Array<:owl, :rdfs, :schema>] regime
+    def apply(*regime)
+      regime.each {|r| require "rdf/reasoner/#{r.downcase}"}
     end
     module_function :apply
 
