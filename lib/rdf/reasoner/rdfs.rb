@@ -6,15 +6,25 @@ module RDF::Reasoner
   #
   # Extends `RDF::Vocabulary::Term` with specific entailment capabilities
   module RDFS
-    @@rdfs_entailment_memos = {
-      subClassOf: {},
-      subPropertyOf: {}
-    }
+    ##
+    # @return [RDF::Util::Cache]
+    # @private
+    def subClassOf_cache
+      @@subClassOf_cache ||= RDF::Util::Cache.new(-1)
+    end
+
+    ##
+    # @return [RDF::Util::Cache]
+    # @private
+    def subPropertyOf_cache
+      @@subPropertyOf_cache ||= RDF::Util::Cache.new(-1)
+    end
+
     ##
     # Return inferred subClassOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
     def _entail_subClassOf
       raise RDF::Reasoner::Error, "#{self} Can't entail subClassOf" unless class?
-      @@rdfs_entailment_memos[:subClassOf][self] ||= begin
+      subClassOf_cache[self] ||= begin
         (Array(self.subClassOf).map {|c| c._entail_subClassOf}.flatten + Array(self.subClassOf) + Array(self)).compact
       end
     end
@@ -23,7 +33,7 @@ module RDF::Reasoner
     # Return inferred subPropertyOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
     def _entail_subPropertyOf
       raise RDF::Reasoner::Error, "#{self} Can't entail subPropertyOf" unless property?
-      @@rdfs_entailment_memos[:subPropertyOf][self] ||= begin
+      subPropertyOf_cache[self] ||= begin
         (Array(self.subPropertyOf).map {|c| c._entail_subPropertyOf}.flatten + Array(self.subPropertyOf) + Array(self)).compact
       end
     end
