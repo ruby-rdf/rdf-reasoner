@@ -25,7 +25,7 @@ module RDF::Reasoner
     def _entail_subClassOf
       raise RDF::Reasoner::Error, "#{self} Can't entail subClassOf" unless class?
       subClassOf_cache[self] ||= begin
-        (Array(self.subClassOf).map {|c| c._entail_subClassOf}.flatten + Array(self.subClassOf) + Array(self)).compact
+        (Array(self.subClassOf).map {|c| c._entail_subClassOf}.flatten + Array(self)).compact
       end
     end
 
@@ -34,7 +34,7 @@ module RDF::Reasoner
     def _entail_subPropertyOf
       raise RDF::Reasoner::Error, "#{self} Can't entail subPropertyOf" unless property?
       subPropertyOf_cache[self] ||= begin
-        (Array(self.subPropertyOf).map {|c| c._entail_subPropertyOf}.flatten + Array(self.subPropertyOf) + Array(self)).compact
+        (Array(self.subPropertyOf).map {|c| c._entail_subPropertyOf}.flatten + Array(self)).compact
       end
     end
 
