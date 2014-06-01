@@ -3,14 +3,14 @@ $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), 'lib')))
 require 'rubygems'
 
 namespace :gem do
-  desc "Build the rdf-turtle-#{File.read('VERSION').chomp}.gem file"
-  task :build => "lib/rdf/turtle/meta.rb" do
-    sh "gem build rdf-turtle.gemspec && mv rdf-turtle-#{File.read('VERSION').chomp}.gem pkg/"
+  desc "Build the rdf-reasoner-#{File.read('VERSION').chomp}.gem file"
+  task :build do
+    sh "gem build rdf-reasoner.gemspec && mv rdf-reasoner-#{File.read('VERSION').chomp}.gem pkg/"
   end
 
-  desc "Release the rdf-turtle-#{File.read('VERSION').chomp}.gem file"
+  desc "Release the rdf-reasoner-#{File.read('VERSION').chomp}.gem file"
   task :release do
-    sh "gem push pkg/rdf-turtle-#{File.read('VERSION').chomp}.gem"
+    sh "gem push pkg/rdf-reasoner-#{File.read('VERSION').chomp}.gem"
   end
 end
 
@@ -38,16 +38,4 @@ end
 require 'yard'
 namespace :doc do
   YARD::Rake::YardocTask.new
-end
-
-desc 'Build first, follow and branch tables'
-task :meta => "lib/rdf/turtle/meta.rb"
-
-file "lib/rdf/turtle/meta.rb" => "etc/turtle.bnf" do |t|
-  sh %{
-    ebnf --ll1 turtleDoc --format rb \
-      --mod-name RDF::Turtle::Meta \
-      --output lib/rdf/turtle/meta.rb \
-      etc/turtle.bnf
-  }
 end

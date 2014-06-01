@@ -1,6 +1,6 @@
 # rdf-reasoner
 
-Reasons over RDFS/OWL vocabularies and schema.org to generate statements which are entailed based on base RDFS/OWL rules along with vocabulary information. It can also be used to ask specific questions, such as if a given object is consistent with the vocabulary ruleset. This can be used to implement [SPARQL Entailment][] Regimes.
+Reasons over RDFS/OWL vocabularies and schema.org to generate statements which are entailed based on base RDFS/OWL rules along with vocabulary information. It can also be used to ask specific questions, such as if a given object is consistent with the vocabulary ruleset. This can be used to implement [SPARQL Entailment][] Regimes and [RDF Schema][] entailment.
 
 ## Features
 
@@ -52,7 +52,8 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
 [SPARQL]:           http://en.wikipedia.org/wiki/SPARQL
 [SPARQL Query]:     http://www.w3.org/TR/2013/REC-sparql11-query-20130321/
-[SPARQL Entailment]:http://www.w3.org/TR/2013/REC-sparql11-reasoner-20130321/
+[SPARQL Entailment]:http://www.w3.org/TR/sparql11-entailment/
 [RDF 1.1]:          http://www.w3.org/TR/rdf11-concepts
 [RDF.rb]:           http://rdf.rubyforge.org/
+[RDF Schema]:       http://www.w3.org/TR/rdf-schema/
 [Rack]:             http://rack.rubyforge.org/
