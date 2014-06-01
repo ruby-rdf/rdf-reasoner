@@ -32,7 +32,7 @@ describe RDF::Reasoner::RDFS do
         specify {expect(cls.entail(:subClass).map(&:pname)).to include(*entails)}
       end
     end
-  end
+  end unless ENV['CI']
 
   describe :subPropertyOf do
     {
