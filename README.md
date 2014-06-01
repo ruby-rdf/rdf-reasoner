@@ -1,21 +1,21 @@
-# rdf-entailment
+# rdf-reasoner
 
-Creates triples for various entailment regimes of a vocabulary for enabling SPARQL 1.1 Entailment.
+Reasons over RDFS/OWL vocabularies and schema.org to generate statements which are entailed based on base RDFS/OWL rules along with vocabulary information. It can also be used to ask specific questions, such as if a given object is consistent with the vocabulary ruleset. This can be used to implement [SPARQL Entailment][] Regimes and [RDF Schema][] entailment.
 
 ## Features
 
-## Description
+* Entail `rdfs:subClassOf` generating an array of terms which are ancestors of the subject.
+* Entail `rdfs:subPropertyOf` generating an array of terms which are ancestors of the subject.
+* Inverse `rdfs:subClassOf` entailment, to find descendant classes of the subject term.
+* `domainCompatible?` determines if a particular resource is compatible with the domain definition of a given predicate, based on the intersection of entailed subclasses with the property domain.
+* `rangeCompatible?` determines if a particular resource is compatible with the range definition of a given predicate, based on the intersection of entailed subclasses or literal types with the property domain.
 
-## Examples
-
-## Documentation
-
-### Principle Classes
+Domain and Range entailment include specific rules for schema.org vocabularies.
 
 ## Dependencies
 
-* [Ruby](http://ruby-lang.org/) (>= 1.9) or (>= 1.8.1 with [Backports][])
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.0)
+* [Ruby](http://ruby-lang.org/) (>= 1.9.2)
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.1)
 
 ## Mailing List
 
@@ -24,8 +24,6 @@ Creates triples for various entailment regimes of a vocabulary for enabling SPAR
 ## Authors
 
 * [Gregg Kellogg](http://github.com/gkellogg) - <http://greggkellogg.net/>
-* [Arto Bendiken](http://github.com/bendiken) - <http://ar.to/>
-* [Pius Uzamere](http://github.com/pius) - <http://pius.me/>
 
 ## Contributing
 
@@ -54,7 +52,8 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
 [SPARQL]:           http://en.wikipedia.org/wiki/SPARQL
 [SPARQL Query]:     http://www.w3.org/TR/2013/REC-sparql11-query-20130321/
-[SPARQL Entailment]:http://www.w3.org/TR/2013/REC-sparql11-entailment-20130321/
+[SPARQL Entailment]:http://www.w3.org/TR/sparql11-entailment/
 [RDF 1.1]:          http://www.w3.org/TR/rdf11-concepts
 [RDF.rb]:           http://rdf.rubyforge.org/
+[RDF Schema]:       http://www.w3.org/TR/rdf-schema/
 [Rack]:             http://rack.rubyforge.org/

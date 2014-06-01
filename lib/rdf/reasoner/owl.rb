@@ -1,6 +1,6 @@
 # coding: utf-8
 
-module RDF::Entailment
+module RDF::Reasoner
   ##
   # Rules for generating OWL entailment triples
   #
