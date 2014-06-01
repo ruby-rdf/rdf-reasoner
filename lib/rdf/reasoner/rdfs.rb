@@ -16,12 +16,27 @@ module RDF::Reasoner
     ##
     # @return [RDF::Util::Cache]
     # @private
+    def subClass_cache
+      @@subClass_cache_cache ||= RDF::Util::Cache.new(-1)
+    end
+
+    ##
+    # @return [RDF::Util::Cache]
+    # @private
+    def descendant_cache
+      @@descendant_cache ||= RDF::Util::Cache.new(-1)
+    end
+
+    ##
+    # @return [RDF::Util::Cache]
+    # @private
     def subPropertyOf_cache
       @@subPropertyOf_cache ||= RDF::Util::Cache.new(-1)
     end
 
     ##
     # Return inferred subClassOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
+    # @private
     def _entail_subClassOf
       raise RDF::Reasoner::Error, "#{self} Can't entail subClassOf" unless class?
       subClassOf_cache[self] ||= begin
@@ -30,7 +45,28 @@ module RDF::Reasoner
     end
 
     ##
+    # Return inferred subClass relationships by recursively applying to named sub classes to get a complete set of classes in the descendant chain of this class
+    # @private
+    def _entail_subClass
+      raise RDF::Reasoner::Error, "#{self} Can't entail subClass" unless class?
+      descendant_cache[self] ||= begin
+        (Array(self.subClass).map {|c| c._entail_subClass rescue c}.flatten + Array(self)).compact
+      end
+    end
+
+    ##
+    # Get the immediate subclasses of this class
+    # @return [Array<RDF::Vocabulary::Term>]
+    def subClass
+      raise RDF::Reasoner::Error, "#{self} Can't entail subClass" unless class?
+      subClass_cache[self] ||= ::RDF::Vocabulary.map do |v|
+        Array(v.properties).select {|p| p.class? && Array(p.subClassOf).include?(self)}
+      end.flatten.compact
+    end
+
+    ##
     # Return inferred subPropertyOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
+    # @private
     def _entail_subPropertyOf
       raise RDF::Reasoner::Error, "#{self} Can't entail subPropertyOf" unless property?
       subPropertyOf_cache[self] ||= begin
@@ -114,6 +150,7 @@ module RDF::Reasoner
     
     def self.included(mod)
       mod.add_entailment :subClassOf, :_entail_subClassOf
+      mod.add_entailment :subClass, :_entail_subClass
       mod.add_entailment :subPropertyOf, :_entail_subPropertyOf
     end
   end

@@ -15,7 +15,7 @@ class RDF::Vocabulary::Term
   end
 
   ##
-  # Perform an entailment on this term
+  # Perform an entailment on this term. Entailments defined within this module are `:subClassOf`, `:subPropertyOf`, and `:subClass`.
   #
   # @param [Symbol] method A registered entailment method
   # @return [Array<Term>]

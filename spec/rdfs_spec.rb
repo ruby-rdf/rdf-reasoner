@@ -21,6 +21,19 @@ describe RDF::Reasoner::RDFS do
     end
   end
 
+  describe :subClass do
+    {
+      RDF::FOAF.Group => [RDF::FOAF.Group, RDF::MO.MusicGroup].map(&:pname),
+      RDF::FOAF.Agent => [RDF::FOAF.Group, RDF::MO.MusicGroup, RDF::FOAF.Organization, RDF::FOAF.Person, RDF::FOAF.Agent].map(&:pname),
+      RDF::CC.License => [RDF::CC.License].map(&:pname),
+      RDF::SCHEMA.Event => [RDF::SCHEMA.Event, RDF::SCHEMA.Festival, RDF::SCHEMA.SportsEvent, RDF::SCHEMA.UserLikes].map(&:pname),
+    }.each do |cls, entails|
+      describe cls.pname do
+        specify {expect(cls.entail(:subClass).map(&:pname)).to include(*entails)}
+      end
+    end
+  end
+
   describe :subPropertyOf do
     {
       RDF::FOAF.aimChatID => [RDF::FOAF.aimChatID, RDF::FOAF.nick].map(&:pname),
