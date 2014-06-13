@@ -55,11 +55,14 @@ module RDF::Reasoner
     end
 
     ##
-    # Get the immediate subclasses of this class
+    # Get the immediate subclasses of this class.
+    #
+    # This iterates over terms defined in the vocabulary of this term, as well as the vocabularies imported by this vocabulary.
+    
     # @return [Array<RDF::Vocabulary::Term>]
     def subClass
       raise RDF::Reasoner::Error, "#{self} Can't entail subClass" unless class?
-      subClass_cache[self] ||= ::RDF::Vocabulary.map do |v|
+      subClass_cache[self] ||= ([self.vocab] + self.vocab.imported_from).map do |v|
         Array(v.properties).select {|p| p.class? && Array(p.subClassOf).include?(self)}
       end.flatten.compact
     end

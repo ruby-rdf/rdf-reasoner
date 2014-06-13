@@ -52,6 +52,13 @@ describe RDF::Reasoner::RDFS do
 
   describe :domain_compatible? do
     let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::FOAF.Person)}
+
+    context "rdf:type" do
+      it "is compatible with rdfs:Resource" do
+        expect(RDF.type).to be_domain_compatible(RDF::RDFS.Resource, queryable)
+      end
+    end
+
     context "domain and no provided types" do
       it "uses entailed types of resource" do
         expect(RDF::FOAF.familyName).to be_domain_compatible(ex+"a", queryable)
