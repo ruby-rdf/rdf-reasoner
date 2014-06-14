@@ -62,7 +62,7 @@ describe RDF::Reasoner::RDFS do
     end
 
     it "uses supplied types" do
-      expect(RDF::FOAF.based_near).not_to be_domain_compatible(ex+"a", queryable)
+      expect(RDF::FOAF.based_near).not_to be_domain_compatible(ex+"a", queryable, types: [RDF::FOAF.Agent])
       expect(RDF::FOAF.based_near).to be_domain_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
       expect(RDF.type).to be_domain_compatible(ex+"a", queryable, types: [RDF::SCHEMA.Thing])
     end
@@ -102,7 +102,7 @@ describe RDF::Reasoner::RDFS do
     end
 
     it "uses supplied types" do
-      expect(RDF::FOAF.based_near).not_to be_range_compatible(ex+"a", queryable)
+      expect(RDF::FOAF.based_near).not_to be_range_compatible(ex+"a", queryable, types: [RDF::FOAF.Agent])
       expect(RDF::FOAF.based_near).to be_range_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
       expect(RDF.type).to be_range_compatible(ex+"a", queryable, types: [RDF::SCHEMA.Thing])
     end
