@@ -140,4 +140,140 @@ describe RDF::Reasoner::SCHEMA do
       end
     end
   end
+
+
+  describe "Roles" do
+    {
+      "Cryptography Users" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:Organization;
+            schema:name "Cryptography Users";
+            schema:member [
+              a schema:OrganizationRole, schema:Role;
+              schema:member [
+                a schema:Person;
+                schema:name "Alice"
+              ];
+              schema:startDate "1977"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.member,
+        result: :domain_range
+      },
+      "Cryptography Users (not domain)" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:Organization;
+            schema:name "Cryptography Users";
+            schema:alumni [
+              a schema:OrganizationRole, schema:Role;
+              schema:member [
+                a schema:Person;
+                schema:name "Alice"
+              ];
+              schema:startDate "1977"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.member,
+        result: :not_domain
+      },
+      "Cryptography Users (not range)" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:Organization;
+            schema:name "Cryptography Users";
+            schema:alumni [
+              a schema:OrganizationRole, schema:Role;
+              schema:member [
+                a schema:Person;
+                schema:name "Alice"
+              ];
+              schema:startDate "1977"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.alumni,
+        result: :not_range
+      },
+      "University of Cambridge" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:CollegeOrUniversity;
+            schema:name "University of Cambridge";
+            schema:sameAs <http://en.wikipedia.org/wiki/University_of_Cambridge>;
+            schema:alumni [
+              a schema:OrganizationRole, schema:Role;
+              schema:alumni [
+                a schema:Person;
+                schema:name "Delia Derbyshire";
+                schema:sameAs <http://en.wikipedia.org/wiki/Delia_Derbyshire>
+              ];
+              schema:startDate "1957"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.alumni,
+        result: :domain_range
+      },
+      "Delia Derbyshire" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:Person;
+            schema:name "Delia Derbyshire";
+            schema:sameAs <http://en.wikipedia.org/wiki/Delia_Derbyshire>;
+            schema:alumniOf [
+              a schema:OrganizationRole, schema:Role;
+              schema:alumniOf [
+                a schema:CollegeOrUniversity;
+                schema:name "University of Cambridge";
+                schema:sameAs <http://en.wikipedia.org/wiki/University_of_Cambridge>
+              ];
+              schema:startDate "1957"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.alumniOf,
+        result: :domain_range
+      },
+      "San Francisco 49ers" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:SportsTeam;
+            schema:name "San Francisco 49ers";
+            schema:member [
+              a schema:PerformanceRole, schema:Role;
+              schema:member [
+                a schema:Person;
+                schema:name "Joe Montana"
+              ];
+              schema:startDate "1979";
+              schema:endDate "1992";
+              schema:namedPosition "Quarterback"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.member,
+        result: :domain_range
+      },
+    }.each do |name, params|
+      context name do
+        let(:graph) {RDF::Graph.new << RDF::Turtle::Reader.new(params[:input])}
+        let(:resource) {graph.first_subject(predicate: RDF.type, object: RDF::SCHEMA.Role)}
+
+        it "allows role in domain", if: params[:result] == :domain_range do
+          expect(params[:predicate]).to be_domain_compatible(resource, graph)
+        end
+
+        it "allows role in range", if: params[:result] == :domain_range  do
+          expect(params[:predicate]).to be_range_compatible(resource, graph)
+        end
+
+        it "does not allow role in domain", if: params[:result] == :not_domain do
+          expect(params[:predicate]).not_to be_domain_compatible(resource, graph)
+        end
+
+        it "does not allow role in range", if: params[:result] == :not_range do
+          expect(params[:predicate]).not_to be_range_compatible(resource, graph)
+        end
+      end
+    end
+  end
+
 end

@@ -28,6 +28,8 @@ module RDF::Reasoner
     #
     # Note that this is different than standard entailment, which simply asserts that the resource has every type in the domain, but this is more useful to check if published data is consistent with the vocabulary definition.
     #
+    # If `resource` is of type `schema:Role`, `resource` is domain acceptable if any other resource references `resource` using this property.
+    #
     # @param [RDF::Resource] resource
     # @param [RDF::Queryable] queryable
     # @param [Hash{Symbol => Object}] options
@@ -47,11 +49,18 @@ module RDF::Reasoner
       end unless domains.empty?
 
       # Every domain must match some entailed type
-      Array(types).empty? || domains.any? {|d| types.include?(d)}
+      resource_acceptable = Array(types).empty? || domains.any? {|d| types.include?(d)}
+
+      # Resource may still be acceptable if types include schema:Role, and any any other resource references `resource` using this property
+      resource_acceptable ||
+        types.include?(RDF::SCHEMA.Role) &&
+          !queryable.query(predicate: self, object: resource).empty?
     end
 
     ##
     # Schema.org requires that if the property has a range, and the resource has a type that some type matches some range. If the resource is a datatyped Literal, and the range includes a datatype, the resource must be consistent with that.
+    #
+    # If `resource` is of type `schema:Role`, it is range acceptable if it has the same property with an acceptable value.
     #
     # Also, a plain literal (or schema:Text) is always compatible with an object range.
     #
@@ -132,8 +141,17 @@ module RDF::Reasoner
               uniq.
               compact
           end
+
           # Every range must match some entailed type
-          Array(types).empty? || ranges.any? {|d| types.include?(d)}
+          resource_acceptable = Array(types).empty? || ranges.any? {|d| types.include?(d)}
+
+          # Resource may still be acceptable if it has the same property with an acceptable value
+          resource_acceptable ||
+            types.include?(RDF::SCHEMA.Role) &&
+              queryable.query(subject: resource, predicate: self).any? do |stmt|
+                acc = self.range_compatible_schema?(stmt.object, queryable)
+                acc
+              end
         end
       else
         true
