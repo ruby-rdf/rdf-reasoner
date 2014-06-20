@@ -8,7 +8,26 @@ module RDF::Reasoner
   # Rules for generating RDFS entailment triples
   #
   # Extends `RDF::Vocabulary::Term` with specific entailment capabilities
-  module SCHEMA
+  module Schema
+    # See http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/
+    #
+    # 
+    ISO_8601 =  %r(^
+      # Year
+      ([\+-]?\d{4}(?!\d{2}\b))
+      # Month
+      ((-?)((0[1-9]|1[0-2])
+            (\3([12]\d|0[1-9]|3[01]))?
+          | W([0-4]\d|5[0-2])(-?[1-7])?
+          | (00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))
+          ([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)
+                 ([\.,]\d+(?!:))?)?
+                (\17[0-5]\d([\.,]\d+)?)?
+                ([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?
+          )?
+      )?
+    $)x.freeze
+
     # domain_includes accessor
     # @return [Array<RDF::Vocabulary::Term>]
     def domain_includes
@@ -81,9 +100,13 @@ module RDF::Reasoner
               [RDF::SCHEMA.Boolean, RDF::XSD.boolean].include?(resource.datatype) ||
               resource.simple? && RDF::Literal::Boolean.new(resource.value).valid?
             when RDF::SCHEMA.Date
-              resource.datatype == RDF::SCHEMA.Date ||
-              resource.is_a?(RDF::Literal::Date) ||
-              resource.simple? && RDF::Literal::Date.new(resource.value).valid?
+              # Schema.org date based on ISO 8601, mapped to appropriate XSD types for validation
+              case resource
+              when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime, RDF::Literal::Duration
+                resource.valid?
+              else
+                ISO_8601.match(resource.value)
+              end
             when RDF::SCHEMA.DateTime
               resource.datatype == RDF::SCHEMA.DateTime ||
               resource.is_a?(RDF::Literal::DateTime) ||
@@ -163,5 +186,5 @@ module RDF::Reasoner
   end
 
   # Extend the Term with this methods
-  ::RDF::Vocabulary::Term.send(:include, SCHEMA)
+  ::RDF::Vocabulary::Term.send(:include, Schema)
 end

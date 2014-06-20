@@ -10,7 +10,7 @@ module RDF
   module Reasoner
     autoload :OWL,     'rdf/reasoner/owl'
     autoload :RDFS,    'rdf/reasoner/rdfs'
-    autoload :SCHEMA,  'rdf/reasoner/schema'
+    autoload :Schema,  'rdf/reasoner/schema'
     autoload :VERSION, 'rdf/reasoner/version'
 
     ##
