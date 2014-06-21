@@ -38,7 +38,7 @@ module RDF::Reasoner
     # Return inferred subClassOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
     # @private
     def _entail_subClassOf
-      raise RDF::Reasoner::Error, "#{self} Can't entail subClassOf" unless class?
+      return Array(self) unless class? && respond_to?(:subClassOf)
       subClassOf_cache[self] ||= begin
         (Array(self.subClassOf).map {|c| c._entail_subClassOf rescue c}.flatten + Array(self)).compact
       end
@@ -48,18 +48,21 @@ module RDF::Reasoner
     # Return inferred subClass relationships by recursively applying to named sub classes to get a complete set of classes in the descendant chain of this class
     # @private
     def _entail_subClass
-      raise RDF::Reasoner::Error, "#{self} Can't entail subClass" unless class?
+      return Array(self) unless class?
       descendant_cache[self] ||= begin
         (Array(self.subClass).map {|c| c._entail_subClass rescue c}.flatten + Array(self)).compact
       end
     end
 
     ##
-    # Get the immediate subclasses of this class
+    # Get the immediate subclasses of this class.
+    #
+    # This iterates over terms defined in the vocabulary of this term, as well as the vocabularies imported by this vocabulary.
+    
     # @return [Array<RDF::Vocabulary::Term>]
     def subClass
       raise RDF::Reasoner::Error, "#{self} Can't entail subClass" unless class?
-      subClass_cache[self] ||= ::RDF::Vocabulary.map do |v|
+      subClass_cache[self] ||= ([self.vocab] + self.vocab.imported_from).map do |v|
         Array(v.properties).select {|p| p.class? && Array(p.subClassOf).include?(self)}
       end.flatten.compact
     end
@@ -68,7 +71,7 @@ module RDF::Reasoner
     # Return inferred subPropertyOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
     # @private
     def _entail_subPropertyOf
-      raise RDF::Reasoner::Error, "#{self} Can't entail subPropertyOf" unless property?
+      return Array(self) unless property? && respond_to?(:subPropertyOf)
       subPropertyOf_cache[self] ||= begin
         (Array(self.subPropertyOf).map {|c| c._entail_subPropertyOf rescue c}.flatten + Array(self)).compact
       end
@@ -87,7 +90,7 @@ module RDF::Reasoner
     def domain_compatible_rdfs?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get domains" unless property?
       if respond_to?(:domain)
-        domains = Array(self.domain) - [RDF::OWL.Thing]
+        domains = Array(self.domain) - [RDF::OWL.Thing, RDF::RDFS.Resource]
 
         # Fully entailed types of the resource
         types = options.fetch(:types) do
@@ -117,7 +120,7 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def range_compatible_rdfs?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
-      if respond_to?(:range) && !(ranges = Array(self.range) - [RDF::OWL.Thing]).empty?
+      if respond_to?(:range) && !(ranges = Array(self.range) - [RDF::OWL.Thing, RDF::RDFS.Resource]).empty?
         if resource.literal?
           ranges.all? do |range|
             case range
@@ -140,6 +143,12 @@ module RDF::Reasoner
               uniq.
               compact
           end
+
+          # If any type is a class, add rdfs:Class
+          if types.any? {|t| t.is_a?(RDF::Vocabulary::Term) && t.class?} && !types.include?(RDF::RDFS.Class)
+            types << RDF::RDFS.Class
+          end
+
           # Every range must match some entailed type
           Array(types).empty? || ranges.all? {|d| types.include?(d)}
         end

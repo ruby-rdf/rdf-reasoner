@@ -8,7 +8,26 @@ module RDF::Reasoner
   # Rules for generating RDFS entailment triples
   #
   # Extends `RDF::Vocabulary::Term` with specific entailment capabilities
-  module SCHEMA
+  module Schema
+    # See http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/
+    #
+    # 
+    ISO_8601 =  %r(^
+      # Year
+      ([\+-]?\d{4}(?!\d{2}\b))
+      # Month
+      ((-?)((0[1-9]|1[0-2])
+            (\3([12]\d|0[1-9]|3[01]))?
+          | W([0-4]\d|5[0-2])(-?[1-7])?
+          | (00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))
+          ([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)
+                 ([\.,]\d+(?!:))?)?
+                (\17[0-5]\d([\.,]\d+)?)?
+                ([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?
+          )?
+      )?
+    $)x.freeze
+
     # domain_includes accessor
     # @return [Array<RDF::Vocabulary::Term>]
     def domain_includes
@@ -27,6 +46,8 @@ module RDF::Reasoner
     # Schema.org requires that if the property has a domain, and the resource has a type that some type matches some domain.
     #
     # Note that this is different than standard entailment, which simply asserts that the resource has every type in the domain, but this is more useful to check if published data is consistent with the vocabulary definition.
+    #
+    # If `resource` is of type `schema:Role`, `resource` is domain acceptable if any other resource references `resource` using this property.
     #
     # @param [RDF::Resource] resource
     # @param [RDF::Queryable] queryable
@@ -47,11 +68,18 @@ module RDF::Reasoner
       end unless domains.empty?
 
       # Every domain must match some entailed type
-      Array(types).empty? || domains.any? {|d| types.include?(d)}
+      resource_acceptable = Array(types).empty? || domains.any? {|d| types.include?(d)}
+
+      # Resource may still be acceptable if types include schema:Role, and any any other resource references `resource` using this property
+      resource_acceptable ||
+        types.include?(RDF::SCHEMA.Role) &&
+          !queryable.query(predicate: self, object: resource).empty?
     end
 
     ##
     # Schema.org requires that if the property has a range, and the resource has a type that some type matches some range. If the resource is a datatyped Literal, and the range includes a datatype, the resource must be consistent with that.
+    #
+    # If `resource` is of type `schema:Role`, it is range acceptable if it has the same property with an acceptable value.
     #
     # Also, a plain literal (or schema:Text) is always compatible with an object range.
     #
@@ -72,9 +100,13 @@ module RDF::Reasoner
               [RDF::SCHEMA.Boolean, RDF::XSD.boolean].include?(resource.datatype) ||
               resource.simple? && RDF::Literal::Boolean.new(resource.value).valid?
             when RDF::SCHEMA.Date
-              resource.datatype == RDF::SCHEMA.Date ||
-              resource.is_a?(RDF::Literal::Date) ||
-              resource.simple? && RDF::Literal::Date.new(resource.value).valid?
+              # Schema.org date based on ISO 8601, mapped to appropriate XSD types for validation
+              case resource
+              when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime, RDF::Literal::Duration
+                resource.valid?
+              else
+                ISO_8601.match(resource.value)
+              end
             when RDF::SCHEMA.DateTime
               resource.datatype == RDF::SCHEMA.DateTime ||
               resource.is_a?(RDF::Literal::DateTime) ||
@@ -132,8 +164,17 @@ module RDF::Reasoner
               uniq.
               compact
           end
+
           # Every range must match some entailed type
-          Array(types).empty? || ranges.any? {|d| types.include?(d)}
+          resource_acceptable = Array(types).empty? || ranges.any? {|d| types.include?(d)}
+
+          # Resource may still be acceptable if it has the same property with an acceptable value
+          resource_acceptable ||
+            types.include?(RDF::SCHEMA.Role) &&
+              queryable.query(subject: resource, predicate: self).any? do |stmt|
+                acc = self.range_compatible_schema?(stmt.object, queryable)
+                acc
+              end
         end
       else
         true
@@ -145,5 +186,5 @@ module RDF::Reasoner
   end
 
   # Extend the Term with this methods
-  ::RDF::Vocabulary::Term.send(:include, SCHEMA)
+  ::RDF::Vocabulary::Term.send(:include, Schema)
 end

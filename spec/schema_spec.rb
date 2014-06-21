@@ -3,7 +3,7 @@ $:.unshift "."
 require 'spec_helper'
 require 'rdf/reasoner/schema'
 
-describe RDF::Reasoner::SCHEMA do
+describe RDF::Reasoner::Schema do
   let(:ex) {RDF::URI("http://example/")}
 
   describe :domainIncludes do
@@ -76,6 +76,87 @@ describe RDF::Reasoner::SCHEMA do
           expect(RDF::Vocabulary.find_term(statement.predicate)).to be_range_compatible(statement.object, graph)
         end
       end
+
+      context "ISO 8601" do
+        %w(
+          2009-12T12:34
+          2009
+          2009-05-19
+          2009-05-19
+          20090519
+          2009123
+          2009-05
+          2009-123
+          2009-222
+          2009-001
+          2009-W01-1
+          2009-W51-1
+          2009-W511
+          2009-W33
+          2009W511
+          2009-05-19
+          2009-05-19_00:00
+          2009-05-19_14
+          2009-05-19_14:31
+          2009-05-19_14:39:22
+          2009-05-19T14:39Z
+          2009-W21-2
+          2009-W21-2T01:22
+          2009-139
+          2009-05-19_14:39:22-06:00
+          2009-05-19_14:39:22+0600
+          2009-05-19_14:39:22-01
+          20090621T0545Z
+          2007-04-06T00:00
+          2007-04-05T24:00
+
+          2010-02-18T16:23:48.5
+          2010-02-18T16:23:48,444
+          2010-02-18T16:23:48,3-06:00
+          2010-02-18T16:23.4
+          2010-02-18T16:23,25
+          2010-02-18T16:23.33+0600
+          2010-02-18T16.23334444
+          2010-02-18T16,2283
+          2009-05-19_143922.500
+          2009-05-19_1439,55
+        ).each do |date|
+          it "recognizes #{date.sub('_', ' ')}" do
+            expect(RDF::SCHEMA.startDate).to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
+          end
+        end
+
+        %w(
+          200905
+          2009367
+          2009-
+          2007-04-05T24:50
+          2009-000
+          2009-M511
+          2009M511
+          2009-05-19T14a39r
+          2009-05-19T14:3924
+          2009-0519
+          2009-05-1914:39
+          2009-05-19_14:
+          2009-05-19r14:39
+          2009-05-19_14a39a22
+          200912-01
+          2009-05-19_14:39:22+06a00
+
+          2009-05-19_146922.500
+          2010-02-18T16.5:23.35:48
+          2010-02-18T16:23.35:48
+          2010-02-18T16:23.35:48.45
+          2009-05-19_14.5.44
+          2010-02-18T16:23.33.600
+          2010-02-18T16,25:23:48,444
+        ).each do |date|
+          it "does not recognize #{date.sub('_', ' ')}" do
+            expect(RDF::SCHEMA.startDate).not_to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
+          end
+        end
+      end
     end
     context "object range violations" do
       {
@@ -140,4 +221,140 @@ describe RDF::Reasoner::SCHEMA do
       end
     end
   end
+
+
+  describe "Roles" do
+    {
+      "Cryptography Users" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:Organization;
+            schema:name "Cryptography Users";
+            schema:member [
+              a schema:OrganizationRole, schema:Role;
+              schema:member [
+                a schema:Person;
+                schema:name "Alice"
+              ];
+              schema:startDate "1977"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.member,
+        result: :domain_range
+      },
+      "Cryptography Users (not domain)" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:Organization;
+            schema:name "Cryptography Users";
+            schema:alumni [
+              a schema:OrganizationRole, schema:Role;
+              schema:member [
+                a schema:Person;
+                schema:name "Alice"
+              ];
+              schema:startDate "1977"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.member,
+        result: :not_domain
+      },
+      "Cryptography Users (not range)" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:Organization;
+            schema:name "Cryptography Users";
+            schema:alumni [
+              a schema:OrganizationRole, schema:Role;
+              schema:member [
+                a schema:Person;
+                schema:name "Alice"
+              ];
+              schema:startDate "1977"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.alumni,
+        result: :not_range
+      },
+      "University of Cambridge" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:CollegeOrUniversity;
+            schema:name "University of Cambridge";
+            schema:sameAs <http://en.wikipedia.org/wiki/University_of_Cambridge>;
+            schema:alumni [
+              a schema:OrganizationRole, schema:Role;
+              schema:alumni [
+                a schema:Person;
+                schema:name "Delia Derbyshire";
+                schema:sameAs <http://en.wikipedia.org/wiki/Delia_Derbyshire>
+              ];
+              schema:startDate "1957"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.alumni,
+        result: :domain_range
+      },
+      "Delia Derbyshire" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:Person;
+            schema:name "Delia Derbyshire";
+            schema:sameAs <http://en.wikipedia.org/wiki/Delia_Derbyshire>;
+            schema:alumniOf [
+              a schema:OrganizationRole, schema:Role;
+              schema:alumniOf [
+                a schema:CollegeOrUniversity;
+                schema:name "University of Cambridge";
+                schema:sameAs <http://en.wikipedia.org/wiki/University_of_Cambridge>
+              ];
+              schema:startDate "1957"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.alumniOf,
+        result: :domain_range
+      },
+      "San Francisco 49ers" => {
+        input: %(
+          @prefix schema: <http://schema.org/> .
+          <http://example/foo> a schema:SportsTeam;
+            schema:name "San Francisco 49ers";
+            schema:member [
+              a schema:PerformanceRole, schema:Role;
+              schema:member [
+                a schema:Person;
+                schema:name "Joe Montana"
+              ];
+              schema:startDate "1979";
+              schema:endDate "1992";
+              schema:namedPosition "Quarterback"
+            ] .
+        ),
+        predicate: RDF::SCHEMA.member,
+        result: :domain_range
+      },
+    }.each do |name, params|
+      context name do
+        let(:graph) {RDF::Graph.new << RDF::Turtle::Reader.new(params[:input])}
+        let(:resource) {graph.first_subject(predicate: RDF.type, object: RDF::SCHEMA.Role)}
+
+        it "allows role in domain", if: params[:result] == :domain_range do
+          expect(params[:predicate]).to be_domain_compatible(resource, graph)
+        end
+
+        it "allows role in range", if: params[:result] == :domain_range  do
+          expect(params[:predicate]).to be_range_compatible(resource, graph)
+        end
+
+        it "does not allow role in domain", if: params[:result] == :not_domain do
+          expect(params[:predicate]).not_to be_domain_compatible(resource, graph)
+        end
+
+        it "does not allow role in range", if: params[:result] == :not_range do
+          expect(params[:predicate]).not_to be_range_compatible(resource, graph)
+        end
+      end
+    end
+  end
+
 end

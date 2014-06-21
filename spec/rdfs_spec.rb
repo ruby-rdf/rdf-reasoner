@@ -14,9 +14,6 @@ describe RDF::Reasoner::RDFS do
     }.each do |cls, entails|
       describe cls.pname do
         specify {expect(cls.entail(:subClassOf).map(&:pname)).to include(*entails)}
-        it "raises error on subPropertyOf" do
-          expect {cls.entail(:subPropertyOf)}.to raise_error(RDF::Reasoner::Error)
-        end
       end
     end
   end
@@ -43,15 +40,13 @@ describe RDF::Reasoner::RDFS do
     }.each do |cls, entails|
       describe cls.pname do
         specify {expect(cls.entail(:subPropertyOf).map(&:pname)).to include(*entails)}
-        it "raises error on subClassOf" do
-          expect {cls.entail(:subClassOf)}.to raise_error(RDF::Reasoner::Error)
-        end
       end
     end
   end
 
   describe :domain_compatible? do
     let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::FOAF.Person)}
+
     context "domain and no provided types" do
       it "uses entailed types of resource" do
         expect(RDF::FOAF.familyName).to be_domain_compatible(ex+"a", queryable)
@@ -67,8 +62,9 @@ describe RDF::Reasoner::RDFS do
     end
 
     it "uses supplied types" do
-      expect(RDF::FOAF.based_near).not_to be_domain_compatible(ex+"a", queryable)
+      expect(RDF::FOAF.based_near).not_to be_domain_compatible(ex+"a", queryable, types: [RDF::FOAF.Agent])
       expect(RDF::FOAF.based_near).to be_domain_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
+      expect(RDF.type).to be_domain_compatible(ex+"a", queryable, types: [RDF::SCHEMA.Thing])
     end
 
     context "domain violations" do
@@ -88,6 +84,8 @@ describe RDF::Reasoner::RDFS do
   end
 
   describe :range_compatible? do
+    let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::FOAF.Person)}
+
     context "objects in range" do
       {
         "object of right type" => %(
@@ -102,6 +100,13 @@ describe RDF::Reasoner::RDFS do
         end
       end
     end
+
+    it "uses supplied types" do
+      expect(RDF::FOAF.based_near).not_to be_range_compatible(ex+"a", queryable, types: [RDF::FOAF.Agent])
+      expect(RDF::FOAF.based_near).to be_range_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
+      expect(RDF.type).to be_range_compatible(ex+"a", queryable, types: [RDF::SCHEMA.Thing])
+    end
+
     context "object range violations" do
       {
         "object of wrong type" => %(
