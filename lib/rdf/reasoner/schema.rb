@@ -148,8 +148,8 @@ module RDF::Reasoner
                   resource.simple? && RDF::Literal(resource.value, :datatype => RDF::URI(range)).valid?
                 end
               else
-                # Otherwise, presume that the range refers to a typed resource
-                false
+                # Otherwise, presume that the range refers to a typed resource. This is allowed if the value is a plain literal
+                resource.plain?
               end
             end
           end
