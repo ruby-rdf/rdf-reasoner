@@ -69,6 +69,10 @@ describe RDF::Reasoner::Schema do
           @prefix schema: <http://schema.org/> .
           <foo> a schema:Order; schema:acceptedOffer [a schema:Offer] .
         ),
+        "object range with plain literal" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> a schema:Order; schema:acceptedOffer "foo" .
+        ),
       }.each do |name, input|
         it name do
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
@@ -164,9 +168,9 @@ describe RDF::Reasoner::Schema do
           @prefix schema: <http://schema.org/> .
           <foo> a schema:Order; schema:acceptedOffer [a schema:Thing] .
         ),
-        "object range with literal" => %(
+        "object range with typed literal" => %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:Order; schema:acceptedOffer "foo" .
+          <foo> a schema:Order; schema:acceptedOffer "foo"^^schema:URL .
         ),
       }.each do |name, input|
         it name do
