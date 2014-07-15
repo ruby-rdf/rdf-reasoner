@@ -28,20 +28,6 @@ module RDF::Reasoner
       )?
     $)x.freeze
 
-    # domain_includes accessor
-    # @return [Array<RDF::Vocabulary::Term>]
-    def domain_includes
-      Array(@attributes["schema:domainIncludes"]).map {|v| RDF::Vocabulary.expand_pname(v)}
-    end
-    alias_method :domainIncludes, :domain_includes
-
-    # range_includes accessor
-    # @return [Array<RDF::Vocabulary::Term>]
-    def range_includes
-      Array(@attributes["schema:rangeIncludes"]).map {|v| RDF::Vocabulary.expand_pname(v)}
-    end
-    alias_method :rangeIncludes, :range_includes
-
     ##
     # Schema.org requires that if the property has a domain, and the resource has a type that some type matches some domain.
     #
