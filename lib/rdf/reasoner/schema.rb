@@ -67,6 +67,8 @@ module RDF::Reasoner
     #
     # If `resource` is of type `schema:Role`, it is range acceptable if it has the same property with an acceptable value.
     #
+    # If `resource` is of type `rdf:List` (must be previously entailed), it is range acceptable if all members of the list are otherwise range acceptable on the same property.
+    #
     # Also, a plain literal (or schema:Text) is always compatible with an object range.
     #
     # @param [RDF::Resource] resource
@@ -156,11 +158,17 @@ module RDF::Reasoner
 
           # Resource may still be acceptable if it has the same property with an acceptable value
           resource_acceptable ||
-            types.include?(RDF::SCHEMA.Role) &&
-              queryable.query(subject: resource, predicate: self).any? do |stmt|
-                acc = self.range_compatible_schema?(stmt.object, queryable)
-                acc
-              end
+
+          # Resource also acceptable if it is a Role, and the Role object contains the same predicate having a compatible object
+          types.include?(RDF::SCHEMA.Role) &&
+            queryable.query(subject: resource, predicate: self).any? do |stmt|
+              acc = self.range_compatible_schema?(stmt.object, queryable)
+              acc
+            end ||
+          # Resource also acceptable if it is a List, and every member of the list is range compatible with the predicate
+          (list = RDF::List.new(resource, queryable)).valid? && list.all? do |member|
+            self.range_compatible_schema?(member, queryable)
+          end
         end
       else
         true

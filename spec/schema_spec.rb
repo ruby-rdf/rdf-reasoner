@@ -216,7 +216,7 @@ describe RDF::Reasoner::Schema do
           @prefix schema: <http://schema.org/> .
           <foo> a schema:CreativeWork; schema:isFamilyFriendly "bar" .
         ),
-      }.each do |name, (input, errors)|
+      }.each do |name, input|
         it name do
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
           statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
@@ -356,6 +356,90 @@ describe RDF::Reasoner::Schema do
 
         it "does not allow role in range", if: params[:result] == :not_range do
           expect(params[:predicate]).not_to be_range_compatible(resource, graph)
+        end
+      end
+    end
+  end
+
+  describe "Lists" do
+    {
+      "Creator list" => {
+        input: %(
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix schema: <http://schema.org/> .
+          <http://example/Review> a schema:Review;
+            schema:creator [
+              a rdf:List;
+              rdf:first [a schema:Person; schema:name "John Doe"];
+              rdf:rest rdf:nil
+            ] .
+        ),
+        resource:   RDF::URI("http://example/Review"),
+        predicate:  RDF::SCHEMA.creator,
+        result:     :range
+      },
+      "Creator list with string value" => {
+        input: %(
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix schema: <http://schema.org/> .
+          <http://example/Review> a schema:Review;
+            schema:creator [
+              a rdf:List;
+              rdf:first "John Doe";
+              rdf:rest rdf:nil
+            ] .
+        ),
+        resource:   RDF::URI("http://example/Review"),
+        predicate:  RDF::SCHEMA.creator,
+        result:     :range
+      },
+      "Creator list (single invalid value)" => {
+        input: %(
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix schema: <http://schema.org/> .
+          <http://example/Review> a schema:Review;
+            schema:creator [
+              a rdf:List;
+              rdf:first [a schema:CreativeWork; schema:name "Website"];
+              rdf:rest rdf:nil
+            ] .
+        ),
+        resource:   RDF::URI("http://example/Review"),
+        predicate:  RDF::SCHEMA.creator,
+        result:     :not_range
+      },
+      "Creator list (mixed valid/invalid)" => {
+        input: %(
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix schema: <http://schema.org/> .
+          <http://example/Review> a schema:Review;
+            schema:creator [
+              a rdf:List;
+              rdf:first [a schema:Person; schema:name "John Doe";];
+              rdf:rest [
+                a rdf:List;
+                rdf:first [a schema:CreativeWork; schema:name "Website"];
+                rdf:rest rdf:nil
+              ]
+            ] .
+        ),
+        resource:   RDF::URI("http://example/Review"),
+        predicate:  RDF::SCHEMA.creator,
+        result:     :not_range
+      },
+    }.each do |name, params|
+      context name do
+        let(:graph) {RDF::Graph.new << RDF::Turtle::Reader.new(params[:input])}
+        let(:resource) {params[:resource]}
+        let(:predicate) {params[:predicate]}
+        let(:list) {graph.first_object(subject: resource, predicate: predicate)}
+
+        it "allows list in range", if: params[:result] == :range do
+          expect(predicate).to be_range_compatible(list, graph)
+        end
+
+        it "does not allow list in range", if: params[:result] == :not_range do
+          expect(predicate).not_to be_range_compatible(list, graph)
         end
       end
     end

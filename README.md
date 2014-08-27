@@ -12,6 +12,11 @@ Reasons over RDFS/OWL vocabularies and schema.org to generate statements which a
 
 Domain and Range entailment include specific rules for schema.org vocabularies.
 
+* A plain literal is an acceptable value for any property.
+* If `resource` is of type `schema:Role`, `resource` is domain acceptable if any other resource references `resource` using the same property.
+* If `resource` is of type `schema:Role`, it is range acceptable if it has the same property with an acceptable value.
+* If `resource` is of type `rdf:List` (must be previously entailed), it is range acceptable if all members of the list are otherwise range acceptable on the same property.
+
 ## Dependencies
 
 * [Ruby](http://ruby-lang.org/) (>= 1.9.2)
