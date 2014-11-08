@@ -4,7 +4,7 @@ module RDF::Reasoner
   ##
   # Rules for generating RDFS entailment triples
   #
-  # Extends `RDF::Vocabulary::Term` with specific entailment capabilities
+  # Extends `RDF::Vocabulary::Term` and `RDF::Statement` with specific entailment capabilities
   module RDFS
     ##
     # @return [RDF::Util::Cache]
@@ -35,22 +35,59 @@ module RDF::Reasoner
     end
 
     ##
-    # Return inferred subClassOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
+    # For a Term: yield or return inferred subClassOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
+    # For a Statement: if predicate is `rdf:types`, yield or return inferred statements having a subClassOf relationship to the type of this statement
     # @private
     def _entail_subClassOf
-      return Array(self) unless class? && respond_to?(:subClassOf)
-      subClassOf_cache[self] ||= begin
-        (Array(self.subClassOf).map {|c| c._entail_subClassOf rescue c}.flatten + Array(self)).compact
+      case self
+      when RDF::Vocabulary::Term
+        unless class? && respond_to?(:subClassOf)
+          yield self if block_given?
+          return Array(self)
+        end
+        terms = subClassOf_cache[self] ||= (
+          Array(self.subClassOf).
+            map {|c| c._entail_subClassOf rescue c}.
+            flatten +
+          Array(self)
+        ).compact
+        terms.each {|t| yield t} if block_given?
+        terms
+      when RDF::Statement
+        statements = []
+        if self.predicate == RDF.type
+          if term = RDF::Vocabulary.find_term(self.object)
+            term._entail_subClassOf do |t|
+              statements << RDF::Statement.new(self.to_hash.merge(object: t))
+            end
+          end
+        end
+        statements.each {|s| yield s} if block_given?
+        statements
+      else []
       end
     end
 
     ##
-    # Return inferred subClass relationships by recursively applying to named sub classes to get a complete set of classes in the descendant chain of this class
+    # For a Term: yield or return inferred subClass relationships by recursively applying to named sub classes to get a complete set of classes in the descendant chain of this class
+    # For a Statement: this is a no-op, as it's not useful in this context
     # @private
     def _entail_subClass
-      return Array(self) unless class?
-      descendant_cache[self] ||= begin
-        (Array(self.subClass).map {|c| c._entail_subClass rescue c}.flatten + Array(self)).compact
+      case self
+      when RDF::Vocabulary::Term
+        unless class?
+          yield self if block_given?
+          return Array(self)
+        end
+        terms = descendant_cache[self] ||= (
+          Array(self.subClass).
+            map {|c| c._entail_subClass rescue c}.
+            flatten +
+          Array(self)
+        ).compact
+        terms.each {|t| yield t} if block_given?
+        terms
+      else []
       end
     end
 
@@ -58,7 +95,6 @@ module RDF::Reasoner
     # Get the immediate subclasses of this class.
     #
     # This iterates over terms defined in the vocabulary of this term, as well as the vocabularies imported by this vocabulary.
-    
     # @return [Array<RDF::Vocabulary::Term>]
     def subClass
       raise RDF::Reasoner::Error, "#{self} Can't entail subClass" unless class?
@@ -68,12 +104,70 @@ module RDF::Reasoner
     end
 
     ##
-    # Return inferred subPropertyOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
+    # For a Term: yield or return inferred subPropertyOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
+    # For a Statement: yield or return inferred statements having a subPropertyOf relationship to predicate of this statement
     # @private
     def _entail_subPropertyOf
-      return Array(self) unless property? && respond_to?(:subPropertyOf)
-      subPropertyOf_cache[self] ||= begin
-        (Array(self.subPropertyOf).map {|c| c._entail_subPropertyOf rescue c}.flatten + Array(self)).compact
+      case self
+      when RDF::Vocabulary::Term
+        unless property? && respond_to?(:subPropertyOf)
+          yield self if block_given?
+          return Array(self)
+        end
+        terms = subPropertyOf_cache[self] ||= (
+          Array(self.subPropertyOf).
+            map {|c| c._entail_subPropertyOf rescue c}.
+            flatten +
+          Array(self)
+        ).compact
+        terms.each {|t| yield t} if block_given?
+        terms
+      when RDF::Statement
+        statements = []
+        if term = RDF::Vocabulary.find_term(self.predicate)
+          term._entail_subPropertyOf do |t|
+            statements << RDF::Statement.new(self.to_hash.merge(predicate: t))
+          end
+        end
+        statements.each {|s| yield s} if block_given?
+        statements
+      else []
+      end
+    end
+
+    ##
+    # For a Statement: yield or return inferred statements having an rdf:type of the domain of the statement predicate
+    # @private
+    def _entail_domain
+      case self
+      when RDF::Statement
+        statements = []
+        if term = RDF::Vocabulary.find_term(self.predicate)
+          term.domain.each do |t|
+            statements << RDF::Statement.new(self.to_hash.merge(predicate: RDF.type, object: t))
+          end
+        end
+        statements.each {|s| yield s} if block_given?
+        statements
+      else []
+      end
+    end
+
+    ##
+    # For a Statement: if object is a resource, yield or return inferred statements having an rdf:type of the range of the statement predicate
+    # @private
+    def _entail_range
+      case self
+      when RDF::Statement
+        statements = []
+        if object.resource? && term = RDF::Vocabulary.find_term(self.predicate)
+          term.range.each do |t|
+            statements << RDF::Statement.new(self.to_hash.merge(subject: self.object, predicate: RDF.type, object: t))
+          end
+        end
+        statements.each {|s| yield s} if block_given?
+        statements
+      else []
       end
     end
 
@@ -161,9 +255,20 @@ module RDF::Reasoner
       mod.add_entailment :subClassOf, :_entail_subClassOf
       mod.add_entailment :subClass, :_entail_subClass
       mod.add_entailment :subPropertyOf, :_entail_subPropertyOf
+      mod.add_entailment :domain, :_entail_domain
+      mod.add_entailment :range, :_entail_range
     end
   end
 
-  # Extend the Term with this methods
+  # Extend Term with these methods
   ::RDF::Vocabulary::Term.send(:include, RDFS)
+
+  # Extend Statement with these methods
+  ::RDF::Statement.send(:include, RDFS)
+
+  # Extend Enumerable with these methods
+  ::RDF::Enumerable.send(:include, RDFS)
+
+  # Extend Mutable with these methods
+  ::RDF::Mutable.send(:include, RDFS)
 end
