@@ -8,7 +8,7 @@ gem 'rdf-turtle', git: "git://github.com/ruby-rdf/rdf-turtle.git", :branch => "d
 group :development, :test do
   gem 'rake'
   gem 'simplecov', require: false
-  gem 'ruby-prof'
+  gem 'ruby-prof', :platforms => :mri
 end
 
 group :debug do
