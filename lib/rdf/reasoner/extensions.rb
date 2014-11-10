@@ -159,8 +159,8 @@ module RDF
 
       self.each do |statement|
         rules.each do |rule|
-          statement.entail(rule) do |statement|
-            statements << statement
+          statement.entail(rule) do |st|
+            statements << st
           end
         end
       end
