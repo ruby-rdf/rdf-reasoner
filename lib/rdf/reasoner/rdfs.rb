@@ -56,7 +56,7 @@ module RDF::Reasoner
       when RDF::Statement
         statements = []
         if self.predicate == RDF.type
-          if term = RDF::Vocabulary.find_term(self.object)
+          if term = (RDF::Vocabulary.find_term(self.object) rescue nil)
             term._entail_subClassOf do |t|
               statements << RDF::Statement.new(self.to_hash.merge(object: t))
             end
@@ -124,7 +124,7 @@ module RDF::Reasoner
         terms
       when RDF::Statement
         statements = []
-        if term = RDF::Vocabulary.find_term(self.predicate)
+        if term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term._entail_subPropertyOf do |t|
             statements << RDF::Statement.new(self.to_hash.merge(predicate: t))
           end
@@ -142,7 +142,7 @@ module RDF::Reasoner
       case self
       when RDF::Statement
         statements = []
-        if term = RDF::Vocabulary.find_term(self.predicate)
+        if term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term.domain.each do |t|
             statements << RDF::Statement.new(self.to_hash.merge(predicate: RDF.type, object: t))
           end
@@ -160,7 +160,7 @@ module RDF::Reasoner
       case self
       when RDF::Statement
         statements = []
-        if object.resource? && term = RDF::Vocabulary.find_term(self.predicate)
+        if object.resource? && term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term.range.each do |t|
             statements << RDF::Statement.new(self.to_hash.merge(subject: self.object, predicate: RDF.type, object: t))
           end
@@ -189,7 +189,7 @@ module RDF::Reasoner
         # Fully entailed types of the resource
         types = options.fetch(:types) do
           queryable.query(:subject => resource, :predicate => RDF.type).
-            map {|s| (t = RDF::Vocabulary.find_term(s.object)) && t.entail(:subClassOf)}.
+            map {|s| (t = (RDF::Vocabulary.find_term(s.object)) rescue nil) && t.entail(:subClassOf)}.
             flatten.
             uniq.
             compact
@@ -232,7 +232,7 @@ module RDF::Reasoner
           # Fully entailed types of the resource
           types = options.fetch(:types) do
             queryable.query(:subject => resource, :predicate => RDF.type).
-              map {|s| (t = RDF::Vocabulary.find_term(s.object)) && t.entail(:subClassOf)}.
+              map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
               flatten.
               uniq.
               compact
