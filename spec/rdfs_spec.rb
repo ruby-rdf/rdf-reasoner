@@ -8,38 +8,198 @@ describe RDF::Reasoner::RDFS do
 
   describe :subClassOf do
     {
-      RDF::FOAF.Group => [RDF::FOAF.Group, RDF::FOAF.Agent].map(&:pname),
-      RDF::CC.License => [RDF::CC.License, RDF::DC.LicenseDocument].map(&:pname),
-      RDF::DC.Location => [RDF::DC.Location, RDF::DC.LocationPeriodOrJurisdiction].map(&:pname),
+      RDF::FOAF.Group => [RDF::FOAF.Group, RDF::FOAF.Agent],
+      RDF::CC.License => [RDF::CC.License, RDF::DC.LicenseDocument],
+      RDF::DC.Location => [RDF::DC.Location, RDF::DC.LocationPeriodOrJurisdiction],
     }.each do |cls, entails|
-      describe cls.pname do
-        specify {expect(cls.entail(:subClassOf).map(&:pname)).to include(*entails)}
+      context cls.pname do
+        describe RDF::Vocabulary::Term do
+          specify {expect(cls.entail(:subClassOf).map(&:pname)).to include(*entails.map(&:pname))}
+          specify {expect {|b| cls.entail(:subClassOf, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Statement do
+          subject {RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          specify {expect(subject.entail(:subClassOf)).to include(*results)}
+          specify {expect {|b| subject.entail(:subClassOf, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Enumerable do
+          subject {[RDF::Statement.new(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          specify {expect(subject.entail(:subClassOf)).to be_a(RDF::Enumerable)}
+          specify {expect(subject.entail(:subClassOf).to_a).to include(*results)}
+          specify {expect {|b| subject.entail(:subClassOf, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Mutable do
+          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
+          let(:results) {
+            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)})
+          }
+          specify {expect(subject.entail(:subClassOf)).to be_a(RDF::Graph)}
+          specify {expect(subject.entail(:subClassOf)).to be_equivalent_graph(results)}
+          specify {expect(subject.entail!(:subClassOf)).to equal subject}
+        end
       end
     end
   end
 
   describe :subClass do
     {
-      RDF::FOAF.Group => [RDF::FOAF.Group, RDF::MO.MusicGroup].map(&:pname),
-      RDF::FOAF.Agent => [RDF::FOAF.Group, RDF::MO.MusicGroup, RDF::FOAF.Organization, RDF::FOAF.Person, RDF::FOAF.Agent].map(&:pname),
-      RDF::CC.License => [RDF::CC.License].map(&:pname),
-      RDF::SCHEMA.Event => [RDF::SCHEMA.Event, RDF::SCHEMA.Festival, RDF::SCHEMA.SportsEvent, RDF::SCHEMA.UserLikes].map(&:pname),
+      RDF::FOAF.Group => [RDF::FOAF.Group, RDF::MO.MusicGroup],
+      RDF::FOAF.Agent => [RDF::FOAF.Group, RDF::MO.MusicGroup, RDF::FOAF.Organization, RDF::FOAF.Person, RDF::FOAF.Agent],
+      RDF::CC.License => [RDF::CC.License],
+      RDF::SCHEMA.Event => [RDF::SCHEMA.Event, RDF::SCHEMA.Festival, RDF::SCHEMA.SportsEvent, RDF::SCHEMA.UserLikes],
     }.each do |cls, entails|
-      describe cls.pname do
-        specify {expect(cls.entail(:subClass).map(&:pname)).to include(*entails)}
+      context cls.pname do
+        describe RDF::Vocabulary::Term do
+          specify {expect(cls.entail(:subClass).map(&:pname)).to include(*entails.map(&:pname))}
+          specify {expect {|b| cls.entail(:subClass, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Statement do
+          subject {RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          specify {expect(subject.entail(:subClass)).to be_empty}
+          specify {expect {|b| subject.entail(:subClass, &b)}.not_to yield_control}
+        end
+
+        describe RDF::Enumerable do
+          subject {[RDF::Statement.new(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
+          specify {expect(subject.entail(:subClass)).to be_a(RDF::Enumerable)}
+          specify {expect(subject.entail(:subClass).to_a).to be_empty}
+          specify {expect {|b| subject.entail(:subClass, &b)}.not_to yield_control}
+        end
+
+        describe RDF::Mutable do
+          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
+          let(:results) {subject.dup}
+          specify {expect(subject.entail(:subClass)).to be_a(RDF::Graph)}
+          specify {expect(subject.entail(:subClass)).to be_equivalent_graph(results)}
+          specify {expect(subject.entail!(:subClass)).to equal subject}
+        end
       end
     end
   end unless ENV['CI']
 
   describe :subPropertyOf do
     {
-      RDF::FOAF.aimChatID => [RDF::FOAF.aimChatID, RDF::FOAF.nick].map(&:pname),
-      RDF::FOAF.name => [RDF::FOAF.name, RDF::RDFS.label].map(&:pname),
-      RDF::CC.license => [RDF::CC.license, RDF::DC.license].map(&:pname),
-      RDF::DC.date => [RDF::DC.date, RDF::DC11.date].map(&:pname),
-    }.each do |cls, entails|
-      describe cls.pname do
-        specify {expect(cls.entail(:subPropertyOf).map(&:pname)).to include(*entails)}
+      RDF::FOAF.aimChatID => [RDF::FOAF.aimChatID, RDF::FOAF.nick],
+      RDF::FOAF.name => [RDF::FOAF.name, RDF::RDFS.label],
+      RDF::CC.license => [RDF::CC.license, RDF::DC.license],
+      RDF::DC.date => [RDF::DC.date, RDF::DC11.date],
+    }.each do |prop, entails|
+      context prop.pname do
+        describe RDF::Vocabulary::Term do
+          specify {expect(prop.entail(:subPropertyOf).map(&:pname)).to include(*entails.map(&:pname))}
+          specify {expect {|b| prop.entail(:subPropertyOf, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Statement do
+          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))}}
+          specify {expect(subject.entail(:subPropertyOf)).to include(*results)}
+          specify {expect {|b| subject.entail(:subPropertyOf, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Enumerable do
+          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))}}
+          specify {expect(subject.entail(:subPropertyOf)).to be_a(RDF::Enumerable)}
+          specify {expect(subject.entail(:subPropertyOf).to_a).to include(*results)}
+          specify {expect {|b| subject.entail(:subPropertyOf, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Mutable do
+          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {
+            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))})
+          }
+          specify {expect(subject.entail(:subPropertyOf)).to be_a(RDF::Graph)}
+          specify {expect(subject.entail(:subPropertyOf)).to be_equivalent_graph(results)}
+          specify {expect(subject.entail!(:subPropertyOf)).to equal subject}
+        end
+      end
+    end
+  end
+
+  describe :domain do
+    {
+      RDF::FOAF.account => [RDF::FOAF.Agent],
+      RDF::DOAP.os => [RDF::DOAP.Project, RDF::DOAP.Version]
+    }.each do |prop, entails|
+      context prop.pname do
+        describe RDF::Vocabulary::Term do
+          specify {expect(prop.entail(:domain)).to be_empty}
+          specify {expect {|b| prop.entail(:domain, &b)}.not_to yield_control}
+        end
+
+        describe RDF::Statement do
+          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          specify {expect(subject.entail(:domain)).to include(*results)}
+          specify {expect {|b| subject.entail(:domain, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Enumerable do
+          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          specify {expect(subject.entail(:domain)).to be_a(RDF::Enumerable)}
+          specify {expect(subject.entail(:domain).to_a).to include(*results)}
+          specify {expect {|b| subject.entail(:domain, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Mutable do
+          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {
+            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)})
+          }
+          specify {expect(subject.entail(:domain)).to be_a(RDF::Graph)}
+          specify {expect(subject.entail(:domain)).to be_equivalent_graph(results)}
+          specify {expect(subject.entail!(:domain)).to equal subject}
+        end
+      end
+    end
+  end
+
+  describe :range do
+    {
+      RDF::CC.jurisdiction => [RDF::CC.Jurisdiction],
+      RDF::CERT.key => [RDF::CERT.Key, RDF::CERT.PublicKey],
+      RDF::DOAP.helper => [RDF::FOAF.Person],
+    }.each do |prop, entails|
+      context prop.pname do
+        describe RDF::Vocabulary::Term do
+          specify {expect(prop.entail(:range)).to be_empty}
+          specify {expect {|b| prop.entail(:range, &b)}.not_to yield_control}
+        end
+
+        describe RDF::Statement do
+          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)}}
+          specify {expect(subject.entail(:range)).to include(*results)}
+          specify {expect {|b| subject.entail(:range, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Enumerable do
+          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)}}
+          specify {expect(subject.entail(:range)).to be_a(RDF::Enumerable)}
+          specify {expect(subject.entail(:range).to_a).to include(*results)}
+          specify {expect {|b| subject.entail(:range, &b)}.to yield_control.at_least(entails.length)}
+        end
+
+        describe RDF::Mutable do
+          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {
+            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)})
+          }
+          specify {expect(subject.entail(:range)).to be_a(RDF::Graph)}
+          specify {expect(subject.entail(:range)).to be_equivalent_graph(results)}
+          specify {expect(subject.entail!(:range)).to equal subject}
+        end
       end
     end
   end

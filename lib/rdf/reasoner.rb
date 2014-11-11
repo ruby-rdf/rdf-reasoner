@@ -18,7 +18,7 @@ module RDF
     #
     # @param [Array<:owl, :rdfs, :schema>] regime
     def apply(*regime)
-      regime.each {|r| require "rdf/reasoner/#{r.downcase}"}
+      regime.each {|r| require "rdf/reasoner/#{r.to_s.downcase}"}
     end
     module_function :apply
 

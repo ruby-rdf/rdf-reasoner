@@ -44,3 +44,6 @@
   dc:date            "2014-06-01"^^xsd:date ;
   dc:creator         <http://greggkellogg.net/foaf#me> ;
   dc:isPartOf        <http://rubygems.org/gems/rdf> .
+
+<http://greggkellogg.net/foaf#me> a foaf:Person, foaf:Agent;
+   foaf:name        "Gregg Kellogg".

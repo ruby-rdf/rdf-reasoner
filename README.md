@@ -6,7 +6,10 @@ Reasons over RDFS/OWL vocabularies and schema.org to generate statements which a
 
 * Entail `rdfs:subClassOf` generating an array of terms which are ancestors of the subject.
 * Entail `rdfs:subPropertyOf` generating an array of terms which are ancestors of the subject.
+* Entail `rdfs:domain` and `rdfs:range` adding `rdf:type` assertions on the subject or object.
 * Inverse `rdfs:subClassOf` entailment, to find descendant classes of the subject term.
+* Entail `owl:equivalentClass` generating an array of terms equivalent to the subject.
+* Entail `owl:equivalentProperty` generating an array of terms equivalent to the subject.
 * `domainCompatible?` determines if a particular resource is compatible with the domain definition of a given predicate, based on the intersection of entailed subclasses with the property domain.
 * `rangeCompatible?` determines if a particular resource is compatible with the range definition of a given predicate, based on the intersection of entailed subclasses or literal types with the property domain.
 
@@ -16,6 +19,67 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
 * If `resource` is of type `schema:Role`, `resource` is domain acceptable if any other resource references `resource` using the same property.
 * If `resource` is of type `schema:Role`, it is range acceptable if it has the same property with an acceptable value.
 * If `resource` is of type `rdf:List` (must be previously entailed), it is range acceptable if all members of the list are otherwise range acceptable on the same property.
+
+## Examples
+### Determine super-classes of a class
+
+    require 'rdf/reasoner'
+
+    RDF::Reasoner.apply(:rdfs)
+    term = RDF::Vocabulary.find_term("http://xmlns.com/foaf/0.1/Person")
+    term.entail(:subClassOf)
+      # => [
+        foaf:Agent,
+        http://www.w3.org/2000/10/swap/pim/contact#Person,
+        geo:SpatialThing,
+        foaf:Person
+      ]
+
+### Determine sub-classes of a class
+
+    require 'rdf/reasoner'
+
+    RDF::Reasoner.apply(:rdfs)
+    term = RDF::FOAF.Person
+    term.entail(:subClass) # => [foaf:Person, mo:SoloMusicArtist]
+
+### Determine if a resource is compatible with the domains of a property
+
+    require 'rdf/reasoner'
+    require 'rdf/turtle'
+
+    RDF::Reasoner.apply(:rdfs)
+    graph = RDF::Graph.load("etc/doap.ttl")
+    subj = RDF::URI("http://rubygems.org/gems/rdf-reasoner")
+    RDF::DOAP.name.domain_compatible?(subj, graph) # => true
+
+### Determine if a resource is compatible with the ranges of a property
+
+    require 'rdf/reasoner'
+    require 'rdf/turtle'
+
+    RDF::Reasoner.apply(:rdfs)
+    graph = RDF::Graph.load("etc/doap.ttl")
+    obj = RDF::Literal(Date.new)
+    RDF::DOAP.created.range_compatible?(obj, graph) # => true
+
+### Perform equivalentClass entailment on a graph
+
+    require 'rdf/reasoner'
+    require 'rdf/turtle'
+
+    RDF::Reasoner.apply(::owl)
+    graph = RDF::Graph.load("etc/doap.ttl")
+    graph.entail!(:equivalentClass)
+
+### Yield all entailed statements for all entailment methods
+
+    require 'rdf/reasoner'
+    require 'rdf/turtle'
+
+    RDF::Reasoner.apply(:rdfs, :owl)
+    graph = RDF::Graph.load("etc/doap.ttl")
+    graph.enum_statement.entail.count # >= graph.enum_statement.count
 
 ## Dependencies
 
