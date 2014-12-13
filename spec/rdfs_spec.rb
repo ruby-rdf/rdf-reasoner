@@ -252,11 +252,70 @@ describe RDF::Reasoner::RDFS do
           @prefix foaf: <http://xmlns.com/foaf/0.1/> .
           <foo> a foaf:Image; foaf:depicts [a foaf:Person] .
         ),
+        "xsd:anyURI with language-tagged literal" => %(
+          @prefix ma: <http://www.w3.org/ns/ma-ont#> .
+          <foo> a ma:MediaResource; ma:locator "http://example/"@en .
+        ),
       }.each do |name, input|
         it name do
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
           statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
           expect(RDF::Vocabulary.find_term(statement.predicate)).to be_range_compatible(statement.object, graph)
+        end
+      end
+
+      context "OGP literal datatypes" do
+        {
+          #"boolean_str" => %(
+          #  <bool> a rdf:Property; rdfs:range; ogc:boolean_str
+          #  <foo> <bool>
+          #    "true"^^ogc:boolean_str, "false"^^ogc:boolean_str,
+          #    true, false
+          #    "true", "false", "1", "0",
+          #    "true"@en, "false"@en, "1"@en, "0"@en .
+          #),
+          #"date_time_str" => %(
+          #  <date_time> a rdf:Property; rdfs:range; ogc:date_time_str
+          #  <foo> <date_time>
+          #    "2009-12T12:34"^^ogc:date_time_str,
+          #    "2009-12T12:34",
+          #    "2009-12T12:34"^^xsd:dateTime .
+          #),
+          "determiner_str" => %(
+            <foo> og:determiner "", "a", "the", "an", "auto" .
+          ),
+          #"float_str" => %(
+          #  <float> a rdf:Property; rdfs:range; ogc:float_str .
+          #  <foo> <float>
+          #    "1.1"^^xsd:float, "1.1e1"^^xsd:double,
+          #    "1.1", "1.1e1",
+          #    "1.1"@en, "1.1e1"@en .
+          #),
+          "integer_str" => %(
+            <foo> og:image:height 1, "1", "1"@en .
+          ),
+          "image_type" => %(
+            <foo> og:image:type "application1+a-b/2foo+bar-baz" .
+          ),
+          "string" => %(
+            <foo> og:description "a", "b"@en .
+          ),
+          "url" => %(
+            <foo> og:image "http://example.com", <https://example.org> .
+          ),
+        }.each do |name, input|
+          it name do
+            input = %(
+              @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix og: <http://ogp.me/ns#> .
+              @prefix ogc: <http://ogp.me/ns/class#> .
+            ) + input
+            graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
+            statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
+            expect(RDF::Vocabulary.find_term(statement.predicate)).to be_range_compatible(statement.object, graph)
+          end
         end
       end
     end
@@ -296,10 +355,6 @@ describe RDF::Reasoner::RDFS do
           @prefix sioc: <http://rdfs.org/sioc/ns#> .
           <foo> sioc:num_authors 1 .
         ),
-        "xsd:anyURI with language-tagged literal" => %(
-          @prefix ma: <http://www.w3.org/ns/ma-ont#> .
-          <foo> a ma:MediaResource; ma:locator "http://example/"@en .
-        ),
         "xsd:anyURI with non-conforming plain literal" => %(
           @prefix ma: <http://www.w3.org/ns/ma-ont#> .
           <foo> a ma:MediaResource; ma:locator "foo" .
@@ -313,6 +368,61 @@ describe RDF::Reasoner::RDFS do
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
           statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
           expect(RDF::Vocabulary.find_term(statement.predicate)).not_to be_range_compatible(statement.object, graph)
+        end
+      end
+
+      context "OGP literal datatypes" do
+        {
+          #"boolean_str" => %(
+          #  <bool> a rdf:Property; rdfs:range; ogc:boolean_str
+          #  <foo> <bool>
+          #    "true"^^ogc:boolean_str, "false"^^ogc:boolean_str,
+          #    true, false
+          #    "true", "false", "1", "0",
+          #    "true"@en, "false"@en, "1"@en, "0"@en .
+          #),
+          #"date_time_str" => %(
+          #  <date_time> a rdf:Property; rdfs:range; ogc:date_time_str
+          #  <foo> <date_time>
+          #    "2009-12T12:34"^^ogc:date_time_str,
+          #    "2009-12T12:34",
+          #    "2009-12T12:34"^^xsd:dateTime .
+          #),
+          "determiner_str" => %(
+            <foo> og:determiner "foo" .
+          ),
+          #"float_str" => %(
+          #  <float> a rdf:Property; rdfs:range; ogc:float_str .
+          #  <foo> <float>
+          #    "1.1"^^xsd:float, "1.1e1"^^xsd:double,
+          #    "1.1", "1.1e1",
+          #    "1.1"@en, "1.1e1"@en .
+          #),
+          "integer_str" => %(
+            <foo> og:image:height 1.1, "1.1", "1.1"@en .
+          ),
+          "image_type" => %(
+            <foo> og:image:type "application" .
+          ),
+          "string" => %(
+            <foo> og:description 1 .
+          ),
+          "url" => %(
+            <foo> og:image "foo" .
+          ),
+        }.each do |name, input|
+          it name do
+            input = %(
+              @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix og: <http://ogp.me/ns#> .
+              @prefix ogc: <http://ogp.me/ns/class#> .
+            ) + input
+            graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
+            statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
+            expect(RDF::Vocabulary.find_term(statement.predicate)).not_to be_range_compatible(statement.object, graph)
+          end
         end
       end
     end
