@@ -9,24 +9,6 @@ module RDF::Reasoner
   #
   # Extends `RDF::Vocabulary::Term` with specific entailment capabilities
   module Schema
-    # See http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/
-    #
-    # 
-    ISO_8601 =  %r(^
-      # Year
-      ([\+-]?\d{4}(?!\d{2}\b))
-      # Month
-      ((-?)((0[1-9]|1[0-2])
-            (\3([12]\d|0[1-9]|3[01]))?
-          | W([0-4]\d|5[0-2])(-?[1-7])?
-          | (00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))
-          ([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)
-                 ([\.,]\d+(?!:))?)?
-                (\17[0-5]\d([\.,]\d+)?)?
-                ([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?
-          )?
-      )?
-    $)x.freeze
 
     ##
     # Schema.org requires that if the property has a domain, and the resource has a type that some type matches some domain.
@@ -86,7 +68,7 @@ module RDF::Reasoner
             when RDF::SCHEMA.Text   then resource.plain? || resource.datatype == RDF::SCHEMA.Text
             when RDF::SCHEMA.Boolean
               [RDF::SCHEMA.Boolean, RDF::XSD.boolean].include?(resource.datatype) ||
-              resource.simple? && RDF::Literal::Boolean.new(resource.value).valid?
+              resource.plain? && RDF::Literal::Boolean.new(resource.value).valid?
             when RDF::SCHEMA.Date
               # Schema.org date based on ISO 8601, mapped to appropriate XSD types for validation
               case resource
@@ -98,34 +80,34 @@ module RDF::Reasoner
             when RDF::SCHEMA.DateTime
               resource.datatype == RDF::SCHEMA.DateTime ||
               resource.is_a?(RDF::Literal::DateTime) ||
-              resource.simple? && RDF::Literal::DateTime.new(resource.value).valid?
+              resource.plain? && RDF::Literal::DateTime.new(resource.value).valid?
             when RDF::SCHEMA.Duration
               value = resource.value
               value = "P#{value}" unless value.start_with?("P")
               resource.datatype == RDF::SCHEMA.Duration ||
               resource.is_a?(RDF::Literal::Duration) ||
-              resource.simple? && RDF::Literal::Duration.new(value).valid?
+              resource.plain? && RDF::Literal::Duration.new(value).valid?
             when RDF::SCHEMA.Time
               resource.datatype == RDF::SCHEMA.Time ||
               resource.is_a?(RDF::Literal::Time) ||
-              resource.simple? && RDF::Literal::Time.new(resource.value).valid?
+              resource.plain? && RDF::Literal::Time.new(resource.value).valid?
             when RDF::SCHEMA.Number
               resource.is_a?(RDF::Literal::Numeric) ||
               [RDF::SCHEMA.Number, RDF::SCHEMA.Float, RDF::SCHEMA.Integer].include?(resource.datatype) ||
-              resource.simple? && RDF::Literal::Integer.new(resource.value).valid? ||
-              resource.simple? && RDF::Literal::Double.new(resource.value).valid?
+              resource.plain? && RDF::Literal::Integer.new(resource.value).valid? ||
+              resource.plain? && RDF::Literal::Double.new(resource.value).valid?
             when RDF::SCHEMA.Float
               resource.is_a?(RDF::Literal::Double) ||
               [RDF::SCHEMA.Number, RDF::SCHEMA.Float].include?(resource.datatype) ||
-              resource.simple? && RDF::Literal::Double.new(resource.value).valid?
+              resource.plain? && RDF::Literal::Double.new(resource.value).valid?
             when RDF::SCHEMA.Integer
               resource.is_a?(RDF::Literal::Integer) ||
               [RDF::SCHEMA.Number, RDF::SCHEMA.Integer].include?(resource.datatype) ||
-              resource.simple? && RDF::Literal::Integer.new(resource.value).valid?
+              resource.plain? && RDF::Literal::Integer.new(resource.value).valid?
             when RDF::SCHEMA.URL
               resource.datatype == RDF::SCHEMA.URL ||
               resource.datatype == RDF::XSD.anyURI ||
-              resource.simple? && RDF::Literal::AnyURI.new(resource.value).valid?
+              resource.plain? && RDF::Literal::AnyURI.new(resource.value).valid?
             else
               # If this is an XSD range, look for appropriate literal
               if range.start_with?(RDF::XSD.to_s)
@@ -133,7 +115,7 @@ module RDF::Reasoner
                   true
                 else
                   # Valid if cast as datatype
-                  resource.simple? && RDF::Literal(resource.value, :datatype => RDF::URI(range)).valid?
+                  resource.plain? && RDF::Literal(resource.value, :datatype => RDF::URI(range)).valid?
                 end
               else
                 # Otherwise, presume that the range refers to a typed resource. This is allowed if the value is a plain literal

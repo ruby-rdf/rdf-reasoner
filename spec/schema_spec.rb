@@ -73,6 +73,10 @@ describe RDF::Reasoner::Schema do
           @prefix schema: <http://schema.org/> .
           <foo> a schema:Order; schema:acceptedOffer "foo" .
         ),
+        "schema:URL with language-tagged literal" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> a schema:Thing; schema:url "http://example/"@en .
+        ),
       }.each do |name, input|
         it name do
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
@@ -203,10 +207,6 @@ describe RDF::Reasoner::Schema do
           @prefix schema: <http://schema.org/> .
           @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
           <foo> a schema:Thing; schema:activeIngredient "foo"^^xsd:token .
-        ),
-        "schema:URL with language-tagged literal" => %(
-          @prefix schema: <http://schema.org/> .
-          <foo> a schema:Thing; schema:url "http://example/"@en .
         ),
         "schema:URL with non-conforming plain literal" => %(
           @prefix schema: <http://schema.org/> .
