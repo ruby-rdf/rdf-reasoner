@@ -182,10 +182,6 @@ module RDF::Reasoner
              RDF::SCHEMA.DateTime, RDF::SCHEMA.Time, RDF::SCHEMA.URL,
              RDF::SCHEMA.Number, RDF::SCHEMA.Float, RDF::SCHEMA.Integer
           true
-        when RDF::SCHEMA.Distance, RDF::SCHEMA.Duration,
-             RDF::SCHEMA.Quantity, RDF::SCHEMA.QuantitativeValue, RDF::SCHEMA.QualitativeValue
-          # Intangibles, which may take literal values
-          true
         else
           # If this is an XSD range, look for appropriate literal
           range.start_with?(RDF::XSD.to_s)
