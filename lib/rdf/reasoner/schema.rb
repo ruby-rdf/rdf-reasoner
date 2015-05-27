@@ -125,6 +125,10 @@ module RDF::Reasoner
           end
         elsif %w(True False).map {|v| RDF::SCHEMA[v]}.include?(resource) && ranges.include?(RDF::SCHEMA.Boolean)
           true # Special case for schema boolean resources
+        elsif ranges.include?(RDF::SCHEMA.URL) && resource.uri?
+          true # schema:URL matches URI resources
+        elsif literal_range?(ranges)
+          false # If resource isn't literal, this is a range violation
         else
           # Fully entailed types of the resource
           types = options.fetch(:types) do
@@ -156,7 +160,28 @@ module RDF::Reasoner
         true
       end
     end
-  
+
+    # Are all ranges literal?
+    # @param [Array<RDF::UR>] ranges
+    # @return [Boolean]
+    def literal_range?(ranges)
+      ranges.all? do |range|
+        case range
+        when RDF::RDFS.Literal, RDF::SCHEMA.Text, RDF::SCHEMA.Boolean, RDF::SCHEMA.Date,
+             RDF::SCHEMA.DateTime, RDF::SCHEMA.Time, RDF::SCHEMA.URL,
+             RDF::SCHEMA.Number, RDF::SCHEMA.Float, RDF::SCHEMA.Integer
+          true
+        when RDF::SCHEMA.Distance, RDF::SCHEMA.Duration,
+             RDF::SCHEMA.Quantity, RDF::SCHEMA.QuantitativeValue, RDF::SCHEMA.QualitativeValue
+          # Intangibles, which may take literal values
+          true
+        else
+          # If this is an XSD range, look for appropriate literal
+          range.start_with?(RDF::XSD.to_s)
+        end
+      end
+    end
+
     def self.included(mod)
     end
   end

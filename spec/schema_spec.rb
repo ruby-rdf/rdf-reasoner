@@ -77,6 +77,10 @@ describe RDF::Reasoner::Schema do
           @prefix schema: <http://schema.org/> .
           <foo> a schema:Thing; schema:url "http://example/"@en .
         ),
+        "schema:URL with URI resource" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> a schema:Thing; schema:url <http://example/> . <http://example/> a schema:Organization .
+        ),
       }.each do |name, input|
         it name do
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
@@ -175,6 +179,14 @@ describe RDF::Reasoner::Schema do
         "object range with typed literal" => %(
           @prefix schema: <http://schema.org/> .
           <foo> a schema:Order; schema:acceptedOffer "foo"^^schema:URL .
+        ),
+        "literal range with BNode" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> schema:height _:bar .
+        ),
+        "literal range with URI (not schema:URL)" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> schema:height <bar> .
         ),
       }.each do |name, input|
         it name do
