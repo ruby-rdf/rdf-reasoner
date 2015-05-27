@@ -4,9 +4,8 @@ script: "bundle exec rspec spec"
 env:
   - CI=true
 rvm:
-  - 1.9.3
   - 2.0
   - 2.1
-  - jruby-19mode
-  - rbx-2
+  - 2.2
+  - jruby
 cache: bundler

@@ -2,6 +2,7 @@
 $:.unshift "."
 require 'spec_helper'
 require 'rdf/reasoner/rdfs'
+require 'rdf/vocab'
 
 describe RDF::Reasoner::RDFS do
   let(:ex) {RDF::URI("http://example/")}
