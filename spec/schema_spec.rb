@@ -77,9 +77,17 @@ describe RDF::Reasoner::Schema do
           @prefix schema: <http://schema.org/> .
           <foo> a schema:Thing; schema:url "http://example/"@en .
         ),
-        "schema:URL with URI resource" => %(
+        "schema:URL with an untyped URI resource" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> a schema:Thing; schema:url <http://example/> .
+        ),
+        "schema:URL with a typed URI resource" => %(
           @prefix schema: <http://schema.org/> .
           <foo> a schema:Thing; schema:url <http://example/> . <http://example/> a schema:Organization .
+        ),
+        "schema:Text with an untyped URI resource" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> a schema:Thing; schema:name <http://example/> .
         ),
       }.each do |name, input|
         it name do
@@ -187,6 +195,10 @@ describe RDF::Reasoner::Schema do
         "literal range with URI (not schema:URL)" => %(
           @prefix schema: <http://schema.org/> .
           <foo> schema:height <bar> .
+        ),
+        "schema:Text with a typed URI resource" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> a schema:Thing; schema:name <http://example/> . <http://example/> a schema:Person .
         ),
       }.each do |name, input|
         it name do

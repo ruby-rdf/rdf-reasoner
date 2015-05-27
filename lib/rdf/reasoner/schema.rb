@@ -127,6 +127,17 @@ module RDF::Reasoner
           true # Special case for schema boolean resources
         elsif ranges.include?(RDF::SCHEMA.URL) && resource.uri?
           true # schema:URL matches URI resources
+        elsif ranges.include?(RDF::SCHEMA.Text) && resource.uri?
+          # Allowed if resource is untyped
+          # Fully entailed types of the resource
+          types = options.fetch(:types) do
+            queryable.query(:subject => resource, :predicate => RDF.type).
+              map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
+              flatten.
+              uniq.
+              compact
+          end
+          types.empty?
         elsif literal_range?(ranges)
           false # If resource isn't literal, this is a range violation
         else
