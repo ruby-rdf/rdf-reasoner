@@ -61,6 +61,7 @@ module RDF::Reasoner
               statements << RDF::Statement.new(self.to_hash.merge(object: t))
             end
           end
+          #$stderr.puts("subClassf(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
         end
         statements.each {|s| yield s} if block_given?
         statements
@@ -128,6 +129,7 @@ module RDF::Reasoner
           term._entail_subPropertyOf do |t|
             statements << RDF::Statement.new(self.to_hash.merge(predicate: t))
           end
+          #$stderr.puts("subPropertyOf(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
         end
         statements.each {|s| yield s} if block_given?
         statements
@@ -147,6 +149,7 @@ module RDF::Reasoner
             statements << RDF::Statement.new(self.to_hash.merge(predicate: RDF.type, object: t))
           end
         end
+        #$stderr.puts("domain(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
         statements.each {|s| yield s} if block_given?
         statements
       else []
@@ -165,6 +168,7 @@ module RDF::Reasoner
             statements << RDF::Statement.new(self.to_hash.merge(subject: self.object, predicate: RDF.type, object: t))
           end
         end
+        #$stderr.puts("range(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}")
         statements.each {|s| yield s} if block_given?
         statements
       else []

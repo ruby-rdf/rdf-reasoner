@@ -42,6 +42,13 @@ module RDF
     module_function :apply
 
     ##
+    # Add all entailment regimes
+    def apply_all
+      apply(*%w(rdfs owl schema))
+    end
+    module_function :apply_all
+
+    ##
     # A reasoner error
     class Error < RuntimeError; end
   end

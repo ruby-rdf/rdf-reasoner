@@ -129,7 +129,8 @@ describe RDF::Reasoner::RDFS do
   describe :domain do
     {
       RDF::FOAF.account => [RDF::FOAF.Agent],
-      RDF::DOAP.os => [RDF::DOAP.Project, RDF::DOAP.Version]
+      RDF::DOAP.os => [RDF::DOAP.Project, RDF::DOAP.Version],
+      RDF::CC.attributionName => [RDF::CC.Work],
     }.each do |prop, entails|
       context prop.pname do
         describe RDF::Vocabulary::Term do

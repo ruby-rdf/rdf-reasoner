@@ -101,7 +101,9 @@ module RDF
     # For best results, either run rules separately expanding the enumberated graph, or run repeatedly until no new statements are added to the enumerable containing both original and entailed statements. As `:subClassOf` and `:subPropertyOf` entailments are implicitly recursive, this may not be necessary except for extreme cases.
     #
     # @overload entail
-    #   @param [Array<Symbol>] *rules Registered entailment method(s)
+    #   @param [Array<Symbol>] *rules
+    #     Registered entailment method(s).
+    #     
     #   @yield statement
     #   @yieldparam [RDF::Statement] statement
     #   @return [void]
@@ -111,7 +113,7 @@ module RDF
     #   @return [Enumerator]
     def entail(*rules, &block)
       if block_given?
-        rules = @@entailments.keys if rules.empty?
+        rules = %w(subClassOf subPropertyOf domain range).map(&:to_sym) if rules.empty?
 
         self.each do |statement|
           rules.each {|rule| statement.entail(rule, &block)}
@@ -154,7 +156,7 @@ module RDF
     # @return [RDF::Mutable]
     # @see [RDF::Enumerable#entail]
     def entail!(*rules, &block)
-      rules = @@entailments.keys if rules.empty?
+      rules = %w(subClassOf subPropertyOf domain range).map(&:to_sym) if rules.empty?
       statements = []
 
       self.each do |statement|
