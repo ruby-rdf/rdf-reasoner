@@ -81,6 +81,22 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
     graph = RDF::Graph.load("etc/doap.ttl")
     graph.enum_statement.entail.count # >= graph.enum_statement.count
 
+### Lint an expanded graph
+
+    require 'rdf/reasoner'
+    require 'rdf/turtle'
+
+    RDF::Reasoner.apply(:rdfs, :owl)
+    graph = RDF::Graph.load("etc/doap.ttl")
+    graph.entail!
+    messages = graph.lint
+    messages.each do |kind, term_messages|
+      term_messages.each do |term, messages|
+        options[:output].puts "#{kind}  #{term}"
+        messages.each {|m| options[:output].puts "  #{m}"}
+      end
+    end
+
 ## Dependencies
 
 * [Ruby](http://ruby-lang.org/) (>= 1.9.2)

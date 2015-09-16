@@ -50,5 +50,13 @@ describe RDF::Reasoner do
       entailed = enumerable.entail
       expect(entailed.count).to be > 1
     end
+
+    it "Lints a graph" do
+      RDF::Reasoner.apply(:rdfs, :owl)
+      graph = RDF::Graph.load("etc/doap.ttl")
+      graph.entail!
+      messages = graph.lint
+      expect(messages).to be_empty
+    end
   end
 end

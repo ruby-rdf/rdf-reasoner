@@ -21,12 +21,24 @@ def run(reader, options)
     secs = Time.new - start
     new_cnt = repo.count - stmt_cnt
     STDERR.puts "\nEntailed #{new_cnt} new statements in #{secs} seconds." unless options[:quiet]
-  elsif options[:validate]
   end
 
-  writer_options = options[:parser_options].merge(prefixes: prefixes, standard_prefixes: true)
-  RDF::Writer.for(options[:output_format] || :ttl).new(options[:output], writer_options) do |w|
-    w << repo
+  if options[:validate]
+    start = Time.new
+    messages = repo.lint
+    secs = Time.new - start
+    STDERR.puts "\nLinted in #{secs} seconds." unless options[:quiet]
+    messages.each do |kind, term_messages|
+      term_messages.each do |term, messages|
+        options[:output].puts "#{kind}  #{term}"
+        messages.each {|m| options[:output].puts "  #{m}"}
+      end
+    end
+  else
+    writer_options = options[:parser_options].merge(prefixes: prefixes, standard_prefixes: true)
+    RDF::Writer.for(options[:output_format] || :ttl).new(options[:output], writer_options) do |w|
+      w << repo
+    end
   end
 end
 
@@ -77,7 +89,7 @@ opts.each do |opt, arg|
   when '--output'       then options[:output] = File.open(arg, "w")
   when '--quiet'        then options[:quiet] = true
   when '--uri'          then parser_options[:base] = arg
-  when '--validate'     then parser_options[:validate] = true
+  when '--validate'     then options[:validate] = true
   when '--help'         then usage
   end
 end
