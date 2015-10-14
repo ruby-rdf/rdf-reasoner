@@ -9,3 +9,4 @@ rvm:
   - 2.2
   - jruby
 cache: bundler
+sudo: false

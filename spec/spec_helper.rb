@@ -6,8 +6,10 @@ require 'simplecov'
 SimpleCov.start
 require 'rspec'
 require 'matchers'
+require 'json/ld'
 require 'rdf/reasoner'
 require 'rdf/turtle'
+require 'rdf/vocab'
 require 'rdf/xsd'
 
 ::RSpec.configure do |c|

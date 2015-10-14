@@ -40,7 +40,7 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
     require 'rdf/reasoner'
 
     RDF::Reasoner.apply(:rdfs)
-    term = RDF::FOAF.Person
+    term = RDF::Vocab::FOAF.Person
     term.entail(:subClass) # => [foaf:Person, mo:SoloMusicArtist]
 
 ### Determine if a resource is compatible with the domains of a property

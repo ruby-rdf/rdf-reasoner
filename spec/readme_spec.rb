@@ -9,17 +9,17 @@ describe RDF::Reasoner do
       RDF::Reasoner.apply(:rdfs)
       term = RDF::Vocabulary.find_term("http://xmlns.com/foaf/0.1/Person")
       expect(term.entail(:subClassOf)).to include *[
-          RDF::FOAF.Agent,
+          RDF::Vocab::FOAF.Agent,
           RDF::URI("http://www.w3.org/2000/10/swap/pim/contact#Person"),
           RDF::GEO.SpatialThing,
-          RDF::FOAF.Person
+          RDF::Vocab::FOAF.Person
         ]
     end
 
     it "Determine sub-classes of a class" do
       RDF::Reasoner.apply(:rdfs)
-      term = RDF::FOAF.Person
-      expect(term.entail(:subClass)).to include *[RDF::FOAF.Person, RDF::MO.SoloMusicArtist]
+      term = RDF::Vocab::FOAF.Person
+      expect(term.entail(:subClass)).to include *[RDF::Vocab::FOAF.Person, RDF::MO.SoloMusicArtist]
     end
 
     it "Determine if a resource is compatible with the domains of a property" do
@@ -40,7 +40,7 @@ describe RDF::Reasoner do
       RDF::Reasoner.apply(:owl)
       graph = RDF::Graph.load("etc/doap.ttl")
       graph.entail!(:equivalentClass)
-      expect(graph).to have_statement(RDF::Statement(RDF::URI("http://greggkellogg.net/foaf#me"), RDF.type, RDF::DC.Agent))
+      expect(graph).to have_statement(RDF::Statement(RDF::URI("http://greggkellogg.net/foaf#me"), RDF.type, RDF::Vocab::DC.Agent))
     end
 
     it "Yield all entailed statements for all entailment methods" do

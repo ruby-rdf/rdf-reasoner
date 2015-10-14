@@ -40,7 +40,7 @@ module RDF::Reasoner
 
       # Resource may still be acceptable if types include schema:Role, and any any other resource references `resource` using this property
       resource_acceptable ||
-        types.include?(RDF::SCHEMA.Role) &&
+        types.include?(RDF::Vocab::SCHEMA.Role) &&
           !queryable.query(predicate: self, object: resource).empty?
     end
 
@@ -65,11 +65,11 @@ module RDF::Reasoner
           ranges.any? do |range|
             case range
             when RDF::RDFS.Literal  then true
-            when RDF::SCHEMA.Text   then resource.plain? || resource.datatype == RDF::SCHEMA.Text
-            when RDF::SCHEMA.Boolean
-              [RDF::SCHEMA.Boolean, RDF::XSD.boolean].include?(resource.datatype) ||
+            when RDF::Vocab::SCHEMA.Text   then resource.plain? || resource.datatype == RDF::Vocab::SCHEMA.Text
+            when RDF::Vocab::SCHEMA.Boolean
+              [RDF::Vocab::SCHEMA.Boolean, RDF::XSD.boolean].include?(resource.datatype) ||
               resource.plain? && RDF::Literal::Boolean.new(resource.value).valid?
-            when RDF::SCHEMA.Date
+            when RDF::Vocab::SCHEMA.Date
               # Schema.org date based on ISO 8601, mapped to appropriate XSD types for validation
               case resource
               when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime, RDF::Literal::Duration
@@ -77,35 +77,35 @@ module RDF::Reasoner
               else
                 ISO_8601.match(resource.value)
               end
-            when RDF::SCHEMA.DateTime
-              resource.datatype == RDF::SCHEMA.DateTime ||
+            when RDF::Vocab::SCHEMA.DateTime
+              resource.datatype == RDF::Vocab::SCHEMA.DateTime ||
               resource.is_a?(RDF::Literal::DateTime) ||
               resource.plain? && RDF::Literal::DateTime.new(resource.value).valid?
-            when RDF::SCHEMA.Duration
+            when RDF::Vocab::SCHEMA.Duration
               value = resource.value
               value = "P#{value}" unless value.start_with?("P")
-              resource.datatype == RDF::SCHEMA.Duration ||
+              resource.datatype == RDF::Vocab::SCHEMA.Duration ||
               resource.is_a?(RDF::Literal::Duration) ||
               resource.plain? && RDF::Literal::Duration.new(value).valid?
-            when RDF::SCHEMA.Time
-              resource.datatype == RDF::SCHEMA.Time ||
+            when RDF::Vocab::SCHEMA.Time
+              resource.datatype == RDF::Vocab::SCHEMA.Time ||
               resource.is_a?(RDF::Literal::Time) ||
               resource.plain? && RDF::Literal::Time.new(resource.value).valid?
-            when RDF::SCHEMA.Number
+            when RDF::Vocab::SCHEMA.Number
               resource.is_a?(RDF::Literal::Numeric) ||
-              [RDF::SCHEMA.Number, RDF::SCHEMA.Float, RDF::SCHEMA.Integer].include?(resource.datatype) ||
+              [RDF::Vocab::SCHEMA.Number, RDF::Vocab::SCHEMA.Float, RDF::Vocab::SCHEMA.Integer].include?(resource.datatype) ||
               resource.plain? && RDF::Literal::Integer.new(resource.value).valid? ||
               resource.plain? && RDF::Literal::Double.new(resource.value).valid?
-            when RDF::SCHEMA.Float
+            when RDF::Vocab::SCHEMA.Float
               resource.is_a?(RDF::Literal::Double) ||
-              [RDF::SCHEMA.Number, RDF::SCHEMA.Float].include?(resource.datatype) ||
+              [RDF::Vocab::SCHEMA.Number, RDF::Vocab::SCHEMA.Float].include?(resource.datatype) ||
               resource.plain? && RDF::Literal::Double.new(resource.value).valid?
-            when RDF::SCHEMA.Integer
+            when RDF::Vocab::SCHEMA.Integer
               resource.is_a?(RDF::Literal::Integer) ||
-              [RDF::SCHEMA.Number, RDF::SCHEMA.Integer].include?(resource.datatype) ||
+              [RDF::Vocab::SCHEMA.Number, RDF::Vocab::SCHEMA.Integer].include?(resource.datatype) ||
               resource.plain? && RDF::Literal::Integer.new(resource.value).valid?
-            when RDF::SCHEMA.URL
-              resource.datatype == RDF::SCHEMA.URL ||
+            when RDF::Vocab::SCHEMA.URL
+              resource.datatype == RDF::Vocab::SCHEMA.URL ||
               resource.datatype == RDF::XSD.anyURI ||
               resource.plain? && RDF::Literal::AnyURI.new(resource.value).valid?
             else
@@ -123,11 +123,11 @@ module RDF::Reasoner
               end
             end
           end
-        elsif %w(True False).map {|v| RDF::SCHEMA[v]}.include?(resource) && ranges.include?(RDF::SCHEMA.Boolean)
+        elsif %w(True False).map {|v| RDF::Vocab::SCHEMA[v]}.include?(resource) && ranges.include?(RDF::Vocab::SCHEMA.Boolean)
           true # Special case for schema boolean resources
-        elsif ranges.include?(RDF::SCHEMA.URL) && resource.uri?
+        elsif ranges.include?(RDF::Vocab::SCHEMA.URL) && resource.uri?
           true # schema:URL matches URI resources
-        elsif ranges.include?(RDF::SCHEMA.Text) && resource.uri?
+        elsif ranges.include?(RDF::Vocab::SCHEMA.Text) && resource.uri?
           # Allowed if resource is untyped
           # Fully entailed types of the resource
           types = options.fetch(:types) do
@@ -157,7 +157,7 @@ module RDF::Reasoner
           resource_acceptable ||
 
           # Resource also acceptable if it is a Role, and the Role object contains the same predicate having a compatible object
-          types.include?(RDF::SCHEMA.Role) &&
+          types.include?(RDF::Vocab::SCHEMA.Role) &&
             queryable.query(subject: resource, predicate: self).any? do |stmt|
               acc = self.range_compatible_schema?(stmt.object, queryable)
               acc
@@ -178,9 +178,9 @@ module RDF::Reasoner
     def literal_range?(ranges)
       ranges.all? do |range|
         case range
-        when RDF::RDFS.Literal, RDF::SCHEMA.Text, RDF::SCHEMA.Boolean, RDF::SCHEMA.Date,
-             RDF::SCHEMA.DateTime, RDF::SCHEMA.Time, RDF::SCHEMA.URL,
-             RDF::SCHEMA.Number, RDF::SCHEMA.Float, RDF::SCHEMA.Integer
+        when RDF::RDFS.Literal, RDF::Vocab::SCHEMA.Text, RDF::Vocab::SCHEMA.Boolean, RDF::Vocab::SCHEMA.Date,
+             RDF::Vocab::SCHEMA.DateTime, RDF::Vocab::SCHEMA.Time, RDF::Vocab::SCHEMA.URL,
+             RDF::Vocab::SCHEMA.Number, RDF::Vocab::SCHEMA.Float, RDF::Vocab::SCHEMA.Integer
           true
         else
           # If this is an XSD range, look for appropriate literal

@@ -30,14 +30,14 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
     @info = if info.respond_to?(:input)
       info
     elsif info.is_a?(Hash)
-      identifier = info[:identifier] || expected.is_a?(RDF::Enumerable) ? expected.context : info[:about]
+      identifier = info[:identifier] || info[:about]
       trace = info[:trace]
       if trace.is_a?(Array)
         trace = trace.map {|s| s.dup.force_encoding(Encoding::UTF_8)}.join("\n")
       end
       Info.new(identifier, info[:comment] || "", trace)
     else
-      Info.new(expected.is_a?(RDF::Enumerable) ? expected.context : info, info.to_s)
+      Info.new(info, info.to_s)
     end
     @expected = normalize(expected)
     @actual = normalize(actual)
