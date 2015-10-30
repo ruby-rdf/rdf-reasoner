@@ -1,0 +1,109 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+$:.unshift(File.expand_path("../../lib", __FILE__))
+require 'rdf/reasoner'
+%w(linkeddata rdf/turtle rdf/vocab).each do |req|
+  begin
+    require req
+  rescue LoadError
+  end
+end
+
+require 'getoptlong'
+
+def run(reader, options)
+  repo = RDF::Repository.new << reader
+  stmt_cnt = repo.count
+  prefixes = reader.prefixes
+  start = Time.new
+  if options[:entail]
+    repo.entail!
+    secs = Time.new - start
+    new_cnt = repo.count - stmt_cnt
+    STDERR.puts "\nEntailed #{new_cnt} new statements in #{secs} seconds." unless options[:quiet]
+  end
+
+  if options[:validate]
+    start = Time.new
+    messages = repo.lint
+    secs = Time.new - start
+    STDERR.puts "\nLinted in #{secs} seconds." unless options[:quiet]
+    messages.each do |kind, term_messages|
+      term_messages.each do |term, messages|
+        options[:output].puts "#{kind}  #{term}"
+        messages.each {|m| options[:output].puts "  #{m}"}
+      end
+    end
+  else
+    writer_options = options[:parser_options].merge(prefixes: prefixes, standard_prefixes: true)
+    RDF::Writer.for(options[:output_format] || :ttl).new(options[:output], writer_options) do |w|
+      w << repo
+    end
+  end
+end
+
+RDF::Reasoner.apply_all
+
+parser_options = {base: nil}
+
+options = {
+  parser_options: parser_options,
+  output:         STDOUT,
+  output_format:  :ttl,
+  input_format:   nil,
+}
+input = nil
+
+OPT_ARGS = [
+  ["--entail",        GetoptLong::NO_ARGUMENT,      "Run entailments on input graph"],
+  ["--format",        GetoptLong::REQUIRED_ARGUMENT,"Specify output format when converting to RDF"],
+  ["--input-format",  GetoptLong::REQUIRED_ARGUMENT,"Format of the input document, when converting from RDF."],
+  ["--output", "-o",  GetoptLong::REQUIRED_ARGUMENT,"Output to the specified file path"],
+  ["--quiet",         GetoptLong::NO_ARGUMENT,      "Supress most output other than progress indicators"],
+  ["--uri",           GetoptLong::REQUIRED_ARGUMENT,"URI to be used as the document base"],
+  ["--validate",      GetoptLong::NO_ARGUMENT,      "Validate input graph with reasoner"],
+  ["--help", "-?",    GetoptLong::NO_ARGUMENT,      "This message"]
+]
+def usage
+  STDERR.puts %{Usage: #{$0} [options] file ...}
+  width = OPT_ARGS.map do |o|
+    l = o.first.length
+    l += o[1].length + 2 if o[1].is_a?(String)
+    l
+  end.max
+  OPT_ARGS.each do |o|
+    s = "  %-*s  " % [width, (o[1].is_a?(String) ? "#{o[0,2].join(', ')}" : o[0])]
+    s += o.last
+    STDERR.puts s
+  end
+  exit(1)
+end
+
+opts = GetoptLong.new(*OPT_ARGS.map {|o| o[0..-2]})
+
+opts.each do |opt, arg|
+  case opt
+  when '--entail'       then options[:entail] = true
+  when '--format'       then options[:output_format] = arg.to_sym
+  when '--input-format' then options[:input_format] = arg.to_sym
+  when '--output'       then options[:output] = File.open(arg, "w")
+  when '--quiet'        then options[:quiet] = true
+  when '--uri'          then parser_options[:base] = arg
+  when '--validate'     then options[:validate] = true
+  when '--help'         then usage
+  end
+end
+
+if ARGV.empty?
+  s = input ? input : $stdin.read
+  RDF::Reader.for(options[:input_format] || :ntriples).new(input, options) do |reader|
+    run(reader, options)
+  end
+else
+  ARGV.each do |file|
+    RDF::Reader.open(file, parser_options) do |reader|
+      run(reader, options)
+    end
+  end
+end
+puts

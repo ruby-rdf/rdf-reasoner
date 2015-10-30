@@ -5,13 +5,14 @@ require 'rdf/reasoner/rdfs'
 require 'rdf/vocab'
 
 describe RDF::Reasoner::RDFS do
+  before(:all) {RDF::Reasoner.apply(:rdfs)}
   let(:ex) {RDF::URI("http://example/")}
 
   describe :subClassOf do
     {
-      RDF::FOAF.Group => [RDF::FOAF.Group, RDF::FOAF.Agent],
-      RDF::CC.License => [RDF::CC.License, RDF::DC.LicenseDocument],
-      RDF::DC.Location => [RDF::DC.Location, RDF::DC.LocationPeriodOrJurisdiction],
+      RDF::Vocab::FOAF.Group => [RDF::Vocab::FOAF.Group, RDF::Vocab::FOAF.Agent],
+      RDF::CC.License => [RDF::CC.License, RDF::Vocab::DC.LicenseDocument],
+      RDF::Vocab::DC.Location => [RDF::Vocab::DC.Location, RDF::Vocab::DC.LocationPeriodOrJurisdiction],
     }.each do |cls, entails|
       context cls.pname do
         describe RDF::Vocabulary::Term do
@@ -49,10 +50,10 @@ describe RDF::Reasoner::RDFS do
 
   describe :subClass do
     {
-      RDF::FOAF.Group => [RDF::FOAF.Group, RDF::MO.MusicGroup],
-      RDF::FOAF.Agent => [RDF::FOAF.Group, RDF::MO.MusicGroup, RDF::FOAF.Organization, RDF::FOAF.Person, RDF::FOAF.Agent],
+      RDF::Vocab::FOAF.Group => [RDF::Vocab::FOAF.Group, RDF::MO.MusicGroup],
+      RDF::Vocab::FOAF.Agent => [RDF::Vocab::FOAF.Group, RDF::MO.MusicGroup, RDF::Vocab::FOAF.Organization, RDF::Vocab::FOAF.Person, RDF::Vocab::FOAF.Agent],
       RDF::CC.License => [RDF::CC.License],
-      RDF::SCHEMA.Event => [RDF::SCHEMA.Event, RDF::SCHEMA.Festival, RDF::SCHEMA.SportsEvent, RDF::SCHEMA.UserLikes],
+      RDF::Vocab::SCHEMA.Event => [RDF::Vocab::SCHEMA.Event, RDF::Vocab::SCHEMA.Festival, RDF::Vocab::SCHEMA.SportsEvent, RDF::Vocab::SCHEMA.UserLikes],
     }.each do |cls, entails|
       context cls.pname do
         describe RDF::Vocabulary::Term do
@@ -87,10 +88,10 @@ describe RDF::Reasoner::RDFS do
 
   describe :subPropertyOf do
     {
-      RDF::FOAF.aimChatID => [RDF::FOAF.aimChatID, RDF::FOAF.nick],
-      RDF::FOAF.name => [RDF::FOAF.name, RDF::RDFS.label],
-      RDF::CC.license => [RDF::CC.license, RDF::DC.license],
-      RDF::DC.date => [RDF::DC.date, RDF::DC11.date],
+      RDF::Vocab::FOAF.aimChatID => [RDF::Vocab::FOAF.aimChatID, RDF::Vocab::FOAF.nick],
+      RDF::Vocab::FOAF.name => [RDF::Vocab::FOAF.name, RDF::RDFS.label],
+      RDF::CC.license => [RDF::CC.license, RDF::Vocab::DC.license],
+      RDF::Vocab::DC.date => [RDF::Vocab::DC.date, RDF::Vocab::DC11.date],
     }.each do |prop, entails|
       context prop.pname do
         describe RDF::Vocabulary::Term do
@@ -128,8 +129,9 @@ describe RDF::Reasoner::RDFS do
 
   describe :domain do
     {
-      RDF::FOAF.account => [RDF::FOAF.Agent],
-      RDF::DOAP.os => [RDF::DOAP.Project, RDF::DOAP.Version]
+      RDF::Vocab::FOAF.account => [RDF::Vocab::FOAF.Agent],
+      RDF::DOAP.os => [RDF::DOAP.Project, RDF::DOAP.Version],
+      RDF::CC.attributionName => [RDF::CC.Work],
     }.each do |prop, entails|
       context prop.pname do
         describe RDF::Vocabulary::Term do
@@ -168,8 +170,8 @@ describe RDF::Reasoner::RDFS do
   describe :range do
     {
       RDF::CC.jurisdiction => [RDF::CC.Jurisdiction],
-      RDF::CERT.key => [RDF::CERT.Key, RDF::CERT.PublicKey],
-      RDF::DOAP.helper => [RDF::FOAF.Person],
+      RDF::Vocab::CERT.key => [RDF::Vocab::CERT.Key, RDF::Vocab::CERT.PublicKey],
+      RDF::DOAP.helper => [RDF::Vocab::FOAF.Person],
     }.each do |prop, entails|
       context prop.pname do
         describe RDF::Vocabulary::Term do
@@ -206,26 +208,26 @@ describe RDF::Reasoner::RDFS do
   end
 
   describe :domain_compatible? do
-    let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::FOAF.Person)}
+    let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::Vocab::FOAF.Person)}
 
     context "domain and no provided types" do
       it "uses entailed types of resource" do
-        expect(RDF::FOAF.familyName).to be_domain_compatible(ex+"a", queryable)
+        expect(RDF::Vocab::FOAF.familyName).to be_domain_compatible(ex+"a", queryable)
       end
     end
 
     it "returns true with no domain and no type" do
-      expect(RDF::DC.date).to be_domain_compatible(ex+"b", queryable)
+      expect(RDF::Vocab::DC.date).to be_domain_compatible(ex+"b", queryable)
     end
 
     it "returns true with no domain and type" do
-      expect(RDF::DC.date).to be_domain_compatible(ex+"a", queryable)
+      expect(RDF::Vocab::DC.date).to be_domain_compatible(ex+"a", queryable)
     end
 
     it "uses supplied types" do
-      expect(RDF::FOAF.based_near).not_to be_domain_compatible(ex+"a", queryable, types: [RDF::FOAF.Agent])
-      expect(RDF::FOAF.based_near).to be_domain_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
-      expect(RDF.type).to be_domain_compatible(ex+"a", queryable, types: [RDF::SCHEMA.Thing])
+      expect(RDF::Vocab::FOAF.based_near).not_to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::FOAF.Agent])
+      expect(RDF::Vocab::FOAF.based_near).to be_domain_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
+      expect(RDF.type).to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMA.Thing])
     end
 
     context "domain violations" do
@@ -245,7 +247,7 @@ describe RDF::Reasoner::RDFS do
   end
 
   describe :range_compatible? do
-    let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::FOAF.Person)}
+    let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::Vocab::FOAF.Person)}
 
     context "objects in range" do
       {
@@ -322,9 +324,9 @@ describe RDF::Reasoner::RDFS do
     end
 
     it "uses supplied types" do
-      expect(RDF::FOAF.based_near).not_to be_range_compatible(ex+"a", queryable, types: [RDF::FOAF.Agent])
-      expect(RDF::FOAF.based_near).to be_range_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
-      expect(RDF.type).to be_range_compatible(ex+"a", queryable, types: [RDF::SCHEMA.Thing])
+      expect(RDF::Vocab::FOAF.based_near).not_to be_range_compatible(ex+"a", queryable, types: [RDF::Vocab::FOAF.Agent])
+      expect(RDF::Vocab::FOAF.based_near).to be_range_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
+      expect(RDF.type).to be_range_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMA.Thing])
     end
 
     context "object range violations" do

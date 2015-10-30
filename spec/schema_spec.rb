@@ -4,11 +4,12 @@ require 'spec_helper'
 require 'rdf/reasoner/schema'
 
 describe RDF::Reasoner::Schema do
+  before(:all) {RDF::Reasoner.apply(:schema, :rdfs)}
   let(:ex) {RDF::URI("http://example/")}
 
   describe :domainIncludes do
     {
-      RDF::SCHEMA.about => [RDF::SCHEMA.CreativeWork].map(&:pname),
+      RDF::Vocab::SCHEMA.about => [RDF::Vocab::SCHEMA.CreativeWork].map(&:pname),
     }.each do |cls, entails|
       describe cls.pname do
         specify {expect(cls.domain_includes.map(&:pname)).to include(*entails)}
@@ -19,8 +20,8 @@ describe RDF::Reasoner::Schema do
 
   describe :rangeIncludes do
     {
-      RDF::SCHEMA.about => [RDF::SCHEMA.Thing].map(&:pname),
-      RDF::SCHEMA.event => [RDF::SCHEMA.Event].map(&:pname),
+      RDF::Vocab::SCHEMA.about => [RDF::Vocab::SCHEMA.Thing].map(&:pname),
+      RDF::Vocab::SCHEMA.event => [RDF::Vocab::SCHEMA.Event].map(&:pname),
     }.each do |cls, entails|
       describe cls.pname do
         specify {expect(cls.range_includes.map(&:pname)).to include(*entails)}
@@ -30,20 +31,20 @@ describe RDF::Reasoner::Schema do
   end
 
   describe :domain_compatible? do
-    let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::SCHEMA.Person)}
+    let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::Vocab::SCHEMA.Person)}
     context "domain and no provided types" do
       it "uses entailed types of resource" do
-        expect(RDF::SCHEMA.familyName).to be_domain_compatible(ex+"a", queryable)
+        expect(RDF::Vocab::SCHEMA.familyName).to be_domain_compatible(ex+"a", queryable)
       end
     end
 
     it "returns true with no domain and no type" do
-      expect(RDF::SCHEMA.dateCreated).to be_domain_compatible(ex+"b", queryable)
+      expect(RDF::Vocab::SCHEMA.dateCreated).to be_domain_compatible(ex+"b", queryable)
     end
 
     it "uses supplied types" do
-      expect(RDF::SCHEMA.dateCreated).not_to be_domain_compatible(ex+"a", queryable)
-      expect(RDF::SCHEMA.dateCreated).to be_domain_compatible(ex+"a", queryable, types: [RDF::SCHEMA.CreativeWork])
+      expect(RDF::Vocab::SCHEMA.dateCreated).not_to be_domain_compatible(ex+"a", queryable)
+      expect(RDF::Vocab::SCHEMA.dateCreated).to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMA.CreativeWork])
     end
 
     context "domain violations" do
@@ -150,7 +151,7 @@ describe RDF::Reasoner::Schema do
           2009-05-19_1439,55
         ).each do |date|
           it "recognizes #{date.sub('_', ' ')}" do
-            expect(RDF::SCHEMA.startDate).to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
+            expect(RDF::Vocab::SCHEMA.startDate).to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
           end
         end
 
@@ -181,7 +182,7 @@ describe RDF::Reasoner::Schema do
           2010-02-18T16,25:23:48,444
         ).each do |date|
           it "does not recognize #{date.sub('_', ' ')}" do
-            expect(RDF::SCHEMA.startDate).not_to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
+            expect(RDF::Vocab::SCHEMA.startDate).not_to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
           end
         end
       end
@@ -275,7 +276,7 @@ describe RDF::Reasoner::Schema do
               schema:startDate "1977"
             ] .
         ),
-        predicate: RDF::SCHEMA.member,
+        predicate: RDF::Vocab::SCHEMA.member,
         result: :domain_range
       },
       "Cryptography Users (not domain)" => {
@@ -292,7 +293,7 @@ describe RDF::Reasoner::Schema do
               schema:startDate "1977"
             ] .
         ),
-        predicate: RDF::SCHEMA.member,
+        predicate: RDF::Vocab::SCHEMA.member,
         result: :not_domain
       },
       "Cryptography Users (not range)" => {
@@ -309,7 +310,7 @@ describe RDF::Reasoner::Schema do
               schema:startDate "1977"
             ] .
         ),
-        predicate: RDF::SCHEMA.alumni,
+        predicate: RDF::Vocab::SCHEMA.alumni,
         result: :not_range
       },
       "University of Cambridge" => {
@@ -328,7 +329,7 @@ describe RDF::Reasoner::Schema do
               schema:startDate "1957"
             ] .
         ),
-        predicate: RDF::SCHEMA.alumni,
+        predicate: RDF::Vocab::SCHEMA.alumni,
         result: :domain_range
       },
       "Delia Derbyshire" => {
@@ -347,7 +348,7 @@ describe RDF::Reasoner::Schema do
               schema:startDate "1957"
             ] .
         ),
-        predicate: RDF::SCHEMA.alumniOf,
+        predicate: RDF::Vocab::SCHEMA.alumniOf,
         result: :domain_range
       },
       "San Francisco 49ers" => {
@@ -366,13 +367,13 @@ describe RDF::Reasoner::Schema do
               schema:namedPosition "Quarterback"
             ] .
         ),
-        predicate: RDF::SCHEMA.member,
+        predicate: RDF::Vocab::SCHEMA.member,
         result: :domain_range
       },
     }.each do |name, params|
       context name do
         let(:graph) {RDF::Graph.new << RDF::Turtle::Reader.new(params[:input])}
-        let(:resource) {graph.first_subject(predicate: RDF.type, object: RDF::SCHEMA.Role)}
+        let(:resource) {graph.first_subject(predicate: RDF.type, object: RDF::Vocab::SCHEMA.Role)}
 
         it "allows role in domain", if: params[:result] == :domain_range do
           expect(params[:predicate]).to be_domain_compatible(resource, graph)
@@ -407,7 +408,7 @@ describe RDF::Reasoner::Schema do
             ] .
         ),
         resource:   RDF::URI("http://example/Review"),
-        predicate:  RDF::SCHEMA.creator,
+        predicate:  RDF::Vocab::SCHEMA.creator,
         result:     :range
       },
       "Creator list with string value" => {
@@ -422,7 +423,7 @@ describe RDF::Reasoner::Schema do
             ] .
         ),
         resource:   RDF::URI("http://example/Review"),
-        predicate:  RDF::SCHEMA.creator,
+        predicate:  RDF::Vocab::SCHEMA.creator,
         result:     :range
       },
       "Creator list (single invalid value)" => {
@@ -437,7 +438,7 @@ describe RDF::Reasoner::Schema do
             ] .
         ),
         resource:   RDF::URI("http://example/Review"),
-        predicate:  RDF::SCHEMA.creator,
+        predicate:  RDF::Vocab::SCHEMA.creator,
         result:     :not_range
       },
       "Creator list (mixed valid/invalid)" => {
@@ -456,7 +457,7 @@ describe RDF::Reasoner::Schema do
             ] .
         ),
         resource:   RDF::URI("http://example/Review"),
-        predicate:  RDF::SCHEMA.creator,
+        predicate:  RDF::Vocab::SCHEMA.creator,
         result:     :not_range
       },
     }.each do |name, params|

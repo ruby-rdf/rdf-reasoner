@@ -10,7 +10,7 @@ FileUtils.mkdir_p(output_dir)
 RDF::Reasoner.apply(:rdfs)
 
 result = RubyProf.profile do
-  RDF::SCHEMA.Event.entail(:subClass).map(&:pname)
+  RDF::Vocab::SCHEMA.Event.entail(:subClass).map(&:pname)
 end
 
 # Print a graph profile to text

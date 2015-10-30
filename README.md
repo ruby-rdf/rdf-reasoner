@@ -40,7 +40,7 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
     require 'rdf/reasoner'
 
     RDF::Reasoner.apply(:rdfs)
-    term = RDF::FOAF.Person
+    term = RDF::Vocab::FOAF.Person
     term.entail(:subClass) # => [foaf:Person, mo:SoloMusicArtist]
 
 ### Determine if a resource is compatible with the domains of a property
@@ -80,6 +80,22 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
     RDF::Reasoner.apply(:rdfs, :owl)
     graph = RDF::Graph.load("etc/doap.ttl")
     graph.enum_statement.entail.count # >= graph.enum_statement.count
+
+### Lint an expanded graph
+
+    require 'rdf/reasoner'
+    require 'rdf/turtle'
+
+    RDF::Reasoner.apply(:rdfs, :owl)
+    graph = RDF::Graph.load("etc/doap.ttl")
+    graph.entail!
+    messages = graph.lint
+    messages.each do |kind, term_messages|
+      term_messages.each do |term, messages|
+        options[:output].puts "#{kind}  #{term}"
+        messages.each {|m| options[:output].puts "  #{m}"}
+      end
+    end
 
 ## Dependencies
 

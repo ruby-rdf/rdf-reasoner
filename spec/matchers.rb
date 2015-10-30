@@ -30,14 +30,14 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
     @info = if info.respond_to?(:input)
       info
     elsif info.is_a?(Hash)
-      identifier = info[:identifier] || expected.is_a?(RDF::Enumerable) ? expected.context : info[:about]
+      identifier = info[:identifier] || info[:about]
       trace = info[:trace]
       if trace.is_a?(Array)
         trace = trace.map {|s| s.dup.force_encoding(Encoding::UTF_8)}.join("\n")
       end
       Info.new(identifier, info[:comment] || "", trace)
     else
-      Info.new(expected.is_a?(RDF::Enumerable) ? expected.context : info, info.to_s)
+      Info.new(info, info.to_s)
     end
     @expected = normalize(expected)
     @actual = normalize(actual)
@@ -60,4 +60,31 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
     "Unsorted Results:\n#{@actual.dump(:ntriples, standard_prefixes:  true)}" +
     (@info.trace ? "\nDebug:\n#{@info.trace}" : "")
   end  
+end
+
+RSpec::Matchers.define :have_errors do |errors|
+  match do |actual|
+    return false unless actual.keys == errors.keys
+    actual.each do |area_key, area_values|
+      return false unless area_values.length == errors[area_key].length
+      area_values.each do |term, values|
+        return false unless values.length == errors[area_key][term].length
+        values.each_with_index do |v, i|
+          return false unless case m = errors[area_key][term][i]
+          when Regexp then m.match v
+          else  m == v
+          end
+        end
+      end
+    end
+    true
+  end
+
+  failure_message do |actual|
+    "expected errors to match #{errors.to_json(JSON::LD::JSON_STATE)}\nwas #{actual.to_json(JSON::LD::JSON_STATE)}"
+  end
+
+  failure_message_when_negated do |actual|
+    "expected errors not to match #{errors.to_json(JSON::LD::JSON_STATE)}"
+  end
 end

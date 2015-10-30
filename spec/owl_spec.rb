@@ -3,15 +3,16 @@ $:.unshift "."
 require 'spec_helper'
 require 'rdf/reasoner/owl'
 
-describe RDF::Reasoner::RDFS do
+describe RDF::Reasoner::OWL do
+  before(:all) {RDF::Reasoner.apply(:owl)}
   let(:ex) {RDF::URI("http://example/")}
 
   describe :equivalentClass do
     {
-      RDF::FOAF.Agent => [RDF::DC.Agent],
-      RDF::DC.Agent => [RDF::FOAF.Agent],
-      RDF::CERT.PGPCertificate => [RDF::WOT.PubKey],
-      RDF::WOT.PubKey => [RDF::CERT.PGPCertificate],
+      RDF::Vocab::FOAF.Agent => [RDF::Vocab::DC.Agent],
+      RDF::Vocab::DC.Agent => [RDF::Vocab::FOAF.Agent],
+      RDF::Vocab::CERT.PGPCertificate => [RDF::Vocab::WOT.PubKey],
+      RDF::Vocab::WOT.PubKey => [RDF::Vocab::CERT.PGPCertificate],
     }.each do |cls, entails|
       context cls.pname do
         describe RDF::Vocabulary::Term do
@@ -49,10 +50,10 @@ describe RDF::Reasoner::RDFS do
 
   describe :equivalentProperty do
     {
-      RDF::DC.creator => [RDF::FOAF.maker],
-      RDF::FOAF.maker => [RDF::DC.creator],
-      RDF::SCHEMA.description => [RDF::DC.description],
-      RDF::DC.description => [RDF::SCHEMA.description],
+      RDF::Vocab::DC.creator => [RDF::Vocab::FOAF.maker],
+      RDF::Vocab::FOAF.maker => [RDF::Vocab::DC.creator],
+      RDF::Vocab::SCHEMA.description => [RDF::Vocab::DC.description],
+      RDF::Vocab::DC.description => [RDF::Vocab::SCHEMA.description],
     }.each do |prop, entails|
       context prop.pname do
         describe RDF::Vocabulary::Term do
