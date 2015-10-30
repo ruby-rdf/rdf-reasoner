@@ -143,7 +143,7 @@ module RDF
 
     # Return a new mutable, composed of original and entailed statements
     #
-    # @param [Array<Symbol>] *rules Registered entailment method(s)
+    # @param [Array<Symbol>] rules Registered entailment method(s)
     # @return [RDF::Mutable]
     # @see [RDF::Enumerable#entail]
     def entail(*rules, &block)
@@ -152,7 +152,7 @@ module RDF
 
     # Add entailed statements to the mutable
     #
-    # @param [Array<Symbol>] *rules Registered entailment method(s)
+    # @param [Array<Symbol>] rules Registered entailment method(s)
     # @return [RDF::Mutable]
     # @see [RDF::Enumerable#entail]
     def entail!(*rules, &block)
