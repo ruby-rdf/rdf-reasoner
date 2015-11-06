@@ -227,12 +227,12 @@ module RDF::Reasoner
               # XSD types are valid if the datatype matches, or they are plain and valid according to the grammar of the range
                 resource.datatype == range ||
                 resource.plain? && RDF::Literal.new(resource.value, datatype: range).valid?
-            elsif range.start_with?(RDF::OGC)
+            elsif range.start_with?(RDF::Vocab::OGC)
               case range
-              when RDF::OGC.boolean_str
-                [RDF::OGC.boolean_str, RDF::XSD.boolean].include?(resource.datatype) ||
+              when RDF::Vocab::OGC.boolean_str
+                [RDF::Vocab::OGC.boolean_str, RDF::XSD.boolean].include?(resource.datatype) ||
                 resource.plain? && RDF::Literal::Boolean.new(resource.value).valid?
-              when RDF::OGC.date_time_str
+              when RDF::Vocab::OGC.date_time_str
                 # Schema.org date based on ISO 8601, mapped to appropriate XSD types for validation
                 case resource
                 when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime, RDF::Literal::Duration
@@ -240,27 +240,27 @@ module RDF::Reasoner
                 else
                   ISO_8601.match(resource.value)
                 end
-              when RDF::OGC.determiner_str
+              when RDF::Vocab::OGC.determiner_str
                 # The lexical space: "", "the", "a", "an", and "auto".
                 resource.plain? && (%w(the a an auto) + [""]).include?(resource.value)
-              when RDF::OGC.float_str
+              when RDF::Vocab::OGC.float_str
                 # A string representation of a 64-bit signed floating point number.  Example lexical values include "1.234", "-1.234", "1.2e3", "-1.2e3", and "7E-10".
-                [RDF::OGC.float_str, RDF::Literal::Double, RDF::Literal::Float].include?(resource.datatype) ||
+                [RDF::Vocab::OGC.float_str, RDF::Literal::Double, RDF::Literal::Float].include?(resource.datatype) ||
                 resource.plain? && RDF::Literal::Double.new(resource.value).valid?
-              when RDF::OGC.integer_str
+              when RDF::Vocab::OGC.integer_str
                 resource.is_a?(RDF::Literal::Integer) ||
-                [RDF::OGC.integer_str].include?(resource.datatype) ||
+                [RDF::Vocab::OGC.integer_str].include?(resource.datatype) ||
                 resource.plain? && RDF::Literal::Integer.new(resource.value).valid?
-              when RDF::OGC.mime_type_str
+              when RDF::Vocab::OGC.mime_type_str
                 # Valid mime type strings \(e.g., "application/mp3"\).
-                [RDF::OGC.mime_type_str].include?(resource.datatype) ||
+                [RDF::Vocab::OGC.mime_type_str].include?(resource.datatype) ||
                 resource.plain? && resource.value =~ %r(^[\w\-\+]+/[\w\-\+]+$)
-              when RDF::OGC.string
+              when RDF::Vocab::OGC.string
                 resource.plain?
-              when RDF::OGC.url
+              when RDF::Vocab::OGC.url
                 # A string of Unicode characters forming a valid URL having the http or https scheme.
                 u = RDF::URI(resource.value)
-                resource.datatype == RDF::OGC.url ||
+                resource.datatype == RDF::Vocab::OGC.url ||
                 resource.datatype == RDF::XSD.anyURI ||
                 resource.simple? && u.valid? && u.scheme.to_s =~ /^https?$/
               else
