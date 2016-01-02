@@ -50,7 +50,7 @@ module RDF::Reasoner
         if self.predicate == RDF.type
           if term = (RDF::Vocabulary.find_term(self.object) rescue nil)
             term._entail_equivalentClass do |t|
-              statements << RDF::Statement.new(self.to_hash.merge(object: t))
+              statements << RDF::Statement(self.to_hash.merge(object: t))
             end
           end
         end
@@ -89,7 +89,7 @@ module RDF::Reasoner
         statements = []
         if term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term._entail_equivalentProperty do |t|
-            statements << RDF::Statement.new(self.to_hash.merge(predicate: t))
+            statements << RDF::Statement(self.to_hash.merge(predicate: t))
           end
         end
         statements.each {|s| yield s} if block_given?

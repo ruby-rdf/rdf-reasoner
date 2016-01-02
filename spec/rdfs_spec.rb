@@ -21,24 +21,24 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {RDF::Statement(RDF::URI("a"), RDF.type, cls)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:subClassOf)).to include(*results)}
           specify {expect {|b| subject.entail(:subClassOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {[RDF::Statement(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:subClassOf)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:subClassOf).to_a).to include(*results)}
           specify {expect {|b| subject.entail(:subClassOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), RDF.type, cls)}
           let(:results) {
-            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)})
+            subject.dup.insert(*entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)})
           }
           specify {expect(subject.entail(:subClassOf)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:subClassOf)).to be_equivalent_graph(results)}
@@ -62,21 +62,21 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {RDF::Statement(RDF::URI("a"), RDF.type, cls)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:subClass)).to be_empty}
           specify {expect {|b| subject.entail(:subClass, &b)}.not_to yield_control}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
+          subject {[RDF::Statement(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
           specify {expect(subject.entail(:subClass)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:subClass).to_a).to be_empty}
           specify {expect {|b| subject.entail(:subClass, &b)}.not_to yield_control}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), RDF.type, cls)}
           let(:results) {subject.dup}
           specify {expect(subject.entail(:subClass)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:subClass)).to be_equivalent_graph(results)}
@@ -100,24 +100,24 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))}}
+          subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), r, RDF::URI("b"))}}
           specify {expect(subject.entail(:subPropertyOf)).to include(*results)}
           specify {expect {|b| subject.entail(:subPropertyOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))}}
+          subject {[RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), r, RDF::URI("b"))}}
           specify {expect(subject.entail(:subPropertyOf)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:subPropertyOf).to_a).to include(*results)}
           specify {expect {|b| subject.entail(:subPropertyOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {
-            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))})
+            subject.dup.insert(*entails.map {|r| RDF::Statement(RDF::URI("a"), r, RDF::URI("b"))})
           }
           specify {expect(subject.entail(:subPropertyOf)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:subPropertyOf)).to be_equivalent_graph(results)}
@@ -140,24 +140,24 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:domain)).to include(*results)}
           specify {expect {|b| subject.entail(:domain, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {[RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:domain)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:domain).to_a).to include(*results)}
           specify {expect {|b| subject.entail(:domain, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {
-            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)})
+            subject.dup.insert(*entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)})
           }
           specify {expect(subject.entail(:domain)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:domain)).to be_equivalent_graph(results)}
@@ -180,24 +180,24 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)}}
+          subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("b"), RDF.type, r)}}
           specify {expect(subject.entail(:range)).to include(*results)}
           specify {expect {|b| subject.entail(:range, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)}}
+          subject {[RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("b"), RDF.type, r)}}
           specify {expect(subject.entail(:range)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:range).to_a).to include(*results)}
           specify {expect {|b| subject.entail(:range, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {
-            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)})
+            subject.dup.insert(*entails.map {|r| RDF::Statement(RDF::URI("b"), RDF.type, r)})
           }
           specify {expect(subject.entail(:range)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:range)).to be_equivalent_graph(results)}
