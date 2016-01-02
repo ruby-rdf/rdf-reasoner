@@ -99,8 +99,8 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
 
 ## Dependencies
 
-* [Ruby](http://ruby-lang.org/) (>= 1.9.2)
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.1)
+* [Ruby](http://ruby-lang.org/) (>= 2.0)
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 2.0)
 
 ## Mailing List
 
