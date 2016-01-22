@@ -107,7 +107,7 @@ module RDF::Reasoner
     # @return [Array<RDF::Vocabulary::Term>]
     def equivalentClass
       raise RDF::Reasoner::Error, "#{self} Can't entail equivalentClass" unless class?
-      Array(self.attributes["owl:equivalentClass"]).map {|t| RDF::Vocabulary.expand_pname(t)}
+      Array(self.attributes[:"owl:equivalentClass"]).map {|t| RDF::Vocabulary.expand_pname(t)}
     end
 
     ##
@@ -119,7 +119,7 @@ module RDF::Reasoner
     # @return [Array<RDF::Vocabulary::Term>]
     def equivalentProperty
       raise RDF::Reasoner::Error, "#{self} Can't entail equivalentProperty" unless property?
-      Array(self.attributes["owl:equivalentProperty"]).map {|t| RDF::Vocabulary.expand_pname(t)}
+      Array(self.attributes[:"owl:equivalentProperty"]).map {|t| RDF::Vocabulary.expand_pname(t)}
     end
     
     def self.included(mod)
