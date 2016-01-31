@@ -26,12 +26,12 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version      = '>= 2.0'
   gem.requirements               = []
-  gem.add_runtime_dependency     'rdf',             '~> 1.99'
-  gem.add_runtime_dependency     'rdf-xsd',         '~> 1.99'
+  gem.add_runtime_dependency     'rdf',             '>= 1.99', '< 3'
+  gem.add_runtime_dependency     'rdf-xsd',         '>= 1.99', '< 3'
 
-  gem.add_runtime_dependency     'rdf-turtle',      '~> 1.99'
-  gem.add_runtime_dependency     'rdf-vocab',       '~> 0.8'
-  gem.add_development_dependency 'linkeddata',      '~> 1.99'
+  gem.add_development_dependency 'json-ld',         '>= 1.99', '< 3'
+  gem.add_development_dependency 'rdf-turtle',      '>= 1.99', '< 3'
+  gem.add_development_dependency 'rdf-vocab',       '>= 0.8'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.4'
   gem.add_development_dependency 'rspec',           '~> 3.4'
   gem.add_development_dependency 'yard' ,           '~> 0.8'
