@@ -2,13 +2,15 @@ source "http://rubygems.org"
 
 gemspec
 
-gem 'rdf', git: "git://github.com/ruby-rdf/rdf.git", branch: "develop"
-gem 'rdf-vocab', git: "git://github.com/ruby-rdf/rdf-vocab.git", branch: "develop"
+gem "rdf",        github: "ruby-rdf/rdf",       branch: "develop"
+gem "rdf-vocab",  github: "ruby-rdf/rdf-vocab", branch: "develop"
 
 group :development, :test do
-  gem 'json-ld',        git: "git://github.com/ruby-rdf/json-ld.git", branch: "develop"
-  gem 'rdf-isomorphic', git: "git://github.com/ruby-rdf/rdf-isomorphic.git", branch: "develop"
-  gem 'rdf-turtle', git: "git://github.com/ruby-rdf/rdf-turtle.git", branch: "develop"
+  gem 'ebnf',               github: "gkellogg/ebnf",                branch: "develop"
+  gem 'json-ld',            github: "ruby-rdf/json-ld",             branch: "develop"
+  gem 'rdf-isomorphic',     github: "ruby-rdf/rdf-isomorphic",      branch: "develop"
+  gem 'rdf-turtle',         github: "ruby-rdf/rdf-turtle",          branch: "develop"
+  gem 'sxp',                github: "gkellogg/sxp-ruby"
   gem 'rake'
   gem 'simplecov',  require: false
   gem 'ruby-prof',  platform: :mri
