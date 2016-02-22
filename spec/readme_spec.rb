@@ -11,7 +11,7 @@ describe RDF::Reasoner do
       expect(term.entail(:subClassOf)).to include *[
           RDF::Vocab::FOAF.Agent,
           RDF::URI("http://www.w3.org/2000/10/swap/pim/contact#Person"),
-          RDF::GEO.SpatialThing,
+          RDF::Vocab::GEO.SpatialThing,
           RDF::Vocab::FOAF.Person
         ]
     end
@@ -19,21 +19,21 @@ describe RDF::Reasoner do
     it "Determine sub-classes of a class" do
       RDF::Reasoner.apply(:rdfs)
       term = RDF::Vocab::FOAF.Person
-      expect(term.entail(:subClass)).to include *[RDF::Vocab::FOAF.Person, RDF::MO.SoloMusicArtist]
+      expect(term.entail(:subClass)).to include *[RDF::Vocab::FOAF.Person, RDF::Vocab::MO.SoloMusicArtist]
     end
 
     it "Determine if a resource is compatible with the domains of a property" do
       RDF::Reasoner.apply(:rdfs)
       graph = RDF::Graph.load("etc/doap.ttl")
       subj = RDF::URI("http://rubygems.org/gems/rdf-reasoner")
-      expect(RDF::DOAP.name).to be_domain_compatible(subj, graph)
+      expect(RDF::Vocab::DOAP.name).to be_domain_compatible(subj, graph)
     end
 
     it "Determine if a resource is compatible with the ranges of a property" do
       RDF::Reasoner.apply(:rdfs)
       graph = RDF::Graph.load("etc/doap.ttl")
       obj = RDF::Literal(Date.new)
-      expect(RDF::DOAP.created).to be_range_compatible(obj, graph)
+      expect(RDF::Vocab::DOAP.created).to be_range_compatible(obj, graph)
     end
 
     it "Perform equivalentClass entailment on a graph" do

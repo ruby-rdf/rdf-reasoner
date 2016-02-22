@@ -51,7 +51,7 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
     RDF::Reasoner.apply(:rdfs)
     graph = RDF::Graph.load("etc/doap.ttl")
     subj = RDF::URI("http://rubygems.org/gems/rdf-reasoner")
-    RDF::DOAP.name.domain_compatible?(subj, graph) # => true
+    RDF::Vocab::DOAP.name.domain_compatible?(subj, graph) # => true
 
 ### Determine if a resource is compatible with the ranges of a property
 
@@ -61,7 +61,7 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
     RDF::Reasoner.apply(:rdfs)
     graph = RDF::Graph.load("etc/doap.ttl")
     obj = RDF::Literal(Date.new)
-    RDF::DOAP.created.range_compatible?(obj, graph) # => true
+    RDF::Vocab::DOAP.created.range_compatible?(obj, graph) # => true
 
 ### Perform equivalentClass entailment on a graph
 
@@ -99,8 +99,8 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
 
 ## Dependencies
 
-* [Ruby](http://ruby-lang.org/) (>= 1.9.2)
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.1)
+* [Ruby](http://ruby-lang.org/) (>= 2.0)
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 2.0)
 
 ## Mailing List
 

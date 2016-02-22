@@ -2,23 +2,25 @@ source "http://rubygems.org"
 
 gemspec
 
-gem 'rdf', git: "git://github.com/ruby-rdf/rdf.git", :branch => "develop"
+gem "rdf",        github: "ruby-rdf/rdf",       branch: "develop"
+gem "rdf-vocab",  github: "ruby-rdf/rdf-vocab", branch: "develop"
 
 group :development, :test do
+  gem 'ebnf',           github: "gkellogg/ebnf",            branch: "develop"
+  gem 'json-ld',        github: "ruby-rdf/json-ld",         branch: "develop"
+  gem 'rdf-isomorphic', github: "ruby-rdf/rdf-isomorphic",  branch: "develop"
+  gem 'rdf-turtle',     github: "ruby-rdf/rdf-turtle",      branch: "develop"
+  gem 'rdf-xsd',        github: "ruby-rdf/rdf-xsd",         branch: "develop"
+  gem 'sxp',            github: "gkellogg/sxp-ruby"
   gem 'rake'
-  gem 'simplecov', require: false
-  gem 'ruby-prof', :platforms => :mri
-  gem 'rdf-turtle', git: "git://github.com/ruby-rdf/rdf-turtle.git", :branch => "develop"
-  gem 'rdf-vocab', git: "git://github.com/ruby-rdf/rdf-vocab.git", :branch => "develop"
+  gem 'simplecov',  require: false
+  gem 'ruby-prof',  platform: :mri
 end
 
 group :debug do
   gem "wirble"
   gem "redcarpet", platforms: :ruby
-  gem "debugger", platforms: :mri_19
-  gem "byebug", platforms: [:mri_20, :mri_21]
-  gem "ruby-debug", platforms: :jruby
-  gem "pry", platforms: :rbx
+  gem "byebug", platforms: :mri
 end
 
 platforms :rbx do

@@ -277,7 +277,7 @@ describe RDF::Queryable, "#lint" do
         expected_errors: {
           property: {
             "schema:member" => [/Object .* not compatible with rangeIncludes \(schema:Organization,schema:Person\)/],
-            "schema:alumni"=> [/Subject .* not compatible with domainIncludes \(schema:EducationalOrganization\)/]
+            "schema:alumni"=> [/Subject .* not compatible with domainIncludes \(schema:EducationalOrganization,schema:Organization\)/]
           }
         }
       },

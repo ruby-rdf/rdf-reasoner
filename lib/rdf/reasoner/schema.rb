@@ -163,7 +163,7 @@ module RDF::Reasoner
               acc
             end ||
           # Resource also acceptable if it is a List, and every member of the list is range compatible with the predicate
-          (list = RDF::List.new(resource, queryable)).valid? && list.all? do |member|
+          (list = RDF::List.new(subject: resource, graph: queryable)).valid? && list.all? do |member|
             self.range_compatible_schema?(member, queryable)
           end
         end

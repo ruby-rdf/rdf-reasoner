@@ -11,7 +11,7 @@ describe RDF::Reasoner::RDFS do
   describe :subClassOf do
     {
       RDF::Vocab::FOAF.Group => [RDF::Vocab::FOAF.Group, RDF::Vocab::FOAF.Agent],
-      RDF::CC.License => [RDF::CC.License, RDF::Vocab::DC.LicenseDocument],
+      RDF::Vocab::CC.License => [RDF::Vocab::CC.License, RDF::Vocab::DC.LicenseDocument],
       RDF::Vocab::DC.Location => [RDF::Vocab::DC.Location, RDF::Vocab::DC.LocationPeriodOrJurisdiction],
     }.each do |cls, entails|
       context cls.pname do
@@ -21,24 +21,24 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {RDF::Statement(RDF::URI("a"), RDF.type, cls)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:subClassOf)).to include(*results)}
           specify {expect {|b| subject.entail(:subClassOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {[RDF::Statement(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:subClassOf)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:subClassOf).to_a).to include(*results)}
           specify {expect {|b| subject.entail(:subClassOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), RDF.type, cls)}
           let(:results) {
-            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)})
+            subject.dup.insert(*entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)})
           }
           specify {expect(subject.entail(:subClassOf)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:subClassOf)).to be_equivalent_graph(results)}
@@ -50,9 +50,9 @@ describe RDF::Reasoner::RDFS do
 
   describe :subClass do
     {
-      RDF::Vocab::FOAF.Group => [RDF::Vocab::FOAF.Group, RDF::MO.MusicGroup],
-      RDF::Vocab::FOAF.Agent => [RDF::Vocab::FOAF.Group, RDF::MO.MusicGroup, RDF::Vocab::FOAF.Organization, RDF::Vocab::FOAF.Person, RDF::Vocab::FOAF.Agent],
-      RDF::CC.License => [RDF::CC.License],
+      RDF::Vocab::FOAF.Group => [RDF::Vocab::FOAF.Group, RDF::Vocab::MO.MusicGroup],
+      RDF::Vocab::FOAF.Agent => [RDF::Vocab::FOAF.Group, RDF::Vocab::MO.MusicGroup, RDF::Vocab::FOAF.Organization, RDF::Vocab::FOAF.Person, RDF::Vocab::FOAF.Agent],
+      RDF::Vocab::CC.License => [RDF::Vocab::CC.License],
       RDF::Vocab::SCHEMA.Event => [RDF::Vocab::SCHEMA.Event, RDF::Vocab::SCHEMA.Festival, RDF::Vocab::SCHEMA.SportsEvent, RDF::Vocab::SCHEMA.UserLikes],
     }.each do |cls, entails|
       context cls.pname do
@@ -62,21 +62,21 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {RDF::Statement(RDF::URI("a"), RDF.type, cls)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:subClass)).to be_empty}
           specify {expect {|b| subject.entail(:subClass, &b)}.not_to yield_control}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
+          subject {[RDF::Statement(RDF::URI("a"), RDF.type, cls)].extend(RDF::Enumerable)}
           specify {expect(subject.entail(:subClass)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:subClass).to_a).to be_empty}
           specify {expect {|b| subject.entail(:subClass, &b)}.not_to yield_control}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), RDF.type, cls)}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), RDF.type, cls)}
           let(:results) {subject.dup}
           specify {expect(subject.entail(:subClass)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:subClass)).to be_equivalent_graph(results)}
@@ -90,7 +90,7 @@ describe RDF::Reasoner::RDFS do
     {
       RDF::Vocab::FOAF.aimChatID => [RDF::Vocab::FOAF.aimChatID, RDF::Vocab::FOAF.nick],
       RDF::Vocab::FOAF.name => [RDF::Vocab::FOAF.name, RDF::RDFS.label],
-      RDF::CC.license => [RDF::CC.license, RDF::Vocab::DC.license],
+      RDF::Vocab::CC.license => [RDF::Vocab::CC.license, RDF::Vocab::DC.license],
       RDF::Vocab::DC.date => [RDF::Vocab::DC.date, RDF::Vocab::DC11.date],
     }.each do |prop, entails|
       context prop.pname do
@@ -100,24 +100,24 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))}}
+          subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), r, RDF::URI("b"))}}
           specify {expect(subject.entail(:subPropertyOf)).to include(*results)}
           specify {expect {|b| subject.entail(:subPropertyOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))}}
+          subject {[RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), r, RDF::URI("b"))}}
           specify {expect(subject.entail(:subPropertyOf)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:subPropertyOf).to_a).to include(*results)}
           specify {expect {|b| subject.entail(:subPropertyOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {
-            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), r, RDF::URI("b"))})
+            subject.dup.insert(*entails.map {|r| RDF::Statement(RDF::URI("a"), r, RDF::URI("b"))})
           }
           specify {expect(subject.entail(:subPropertyOf)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:subPropertyOf)).to be_equivalent_graph(results)}
@@ -130,8 +130,8 @@ describe RDF::Reasoner::RDFS do
   describe :domain do
     {
       RDF::Vocab::FOAF.account => [RDF::Vocab::FOAF.Agent],
-      RDF::DOAP.os => [RDF::DOAP.Project, RDF::DOAP.Version],
-      RDF::CC.attributionName => [RDF::CC.Work],
+      RDF::Vocab::DOAP.os => [RDF::Vocab::DOAP.Project, RDF::Vocab::DOAP.Version],
+      RDF::Vocab::CC.attributionName => [RDF::Vocab::CC.Work],
     }.each do |prop, entails|
       context prop.pname do
         describe RDF::Vocabulary::Term do
@@ -140,24 +140,24 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:domain)).to include(*results)}
           specify {expect {|b| subject.entail(:domain, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)}}
+          subject {[RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:domain)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:domain).to_a).to include(*results)}
           specify {expect {|b| subject.entail(:domain, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {
-            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("a"), RDF.type, r)})
+            subject.dup.insert(*entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)})
           }
           specify {expect(subject.entail(:domain)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:domain)).to be_equivalent_graph(results)}
@@ -169,9 +169,9 @@ describe RDF::Reasoner::RDFS do
 
   describe :range do
     {
-      RDF::CC.jurisdiction => [RDF::CC.Jurisdiction],
+      RDF::Vocab::CC.jurisdiction => [RDF::Vocab::CC.Jurisdiction],
       RDF::Vocab::CERT.key => [RDF::Vocab::CERT.Key, RDF::Vocab::CERT.PublicKey],
-      RDF::DOAP.helper => [RDF::Vocab::FOAF.Person],
+      RDF::Vocab::DOAP.helper => [RDF::Vocab::FOAF.Person],
     }.each do |prop, entails|
       context prop.pname do
         describe RDF::Vocabulary::Term do
@@ -180,24 +180,24 @@ describe RDF::Reasoner::RDFS do
         end
 
         describe RDF::Statement do
-          subject {RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)}}
+          subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("b"), RDF.type, r)}}
           specify {expect(subject.entail(:range)).to include(*results)}
           specify {expect {|b| subject.entail(:range, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Enumerable do
-          subject {[RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
-          let(:results) {entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)}}
+          subject {[RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))].extend(RDF::Enumerable)}
+          let(:results) {entails.map {|r| RDF::Statement(RDF::URI("b"), RDF.type, r)}}
           specify {expect(subject.entail(:range)).to be_a(RDF::Enumerable)}
           specify {expect(subject.entail(:range).to_a).to include(*results)}
           specify {expect {|b| subject.entail(:range, &b)}.to yield_control.at_least(entails.length)}
         end
 
         describe RDF::Mutable do
-          subject {RDF::Graph.new << RDF::Statement.new(RDF::URI("a"), prop, RDF::URI("b"))}
+          subject {RDF::Graph.new << RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {
-            subject.dup.insert(*entails.map {|r| RDF::Statement.new(RDF::URI("b"), RDF.type, r)})
+            subject.dup.insert(*entails.map {|r| RDF::Statement(RDF::URI("b"), RDF.type, r)})
           }
           specify {expect(subject.entail(:range)).to be_a(RDF::Graph)}
           specify {expect(subject.entail(:range)).to be_equivalent_graph(results)}
@@ -226,7 +226,7 @@ describe RDF::Reasoner::RDFS do
 
     it "uses supplied types" do
       expect(RDF::Vocab::FOAF.based_near).not_to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::FOAF.Agent])
-      expect(RDF::Vocab::FOAF.based_near).to be_domain_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
+      expect(RDF::Vocab::FOAF.based_near).to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::GEO.SpatialThing])
       expect(RDF.type).to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMA.Thing])
     end
 
@@ -325,7 +325,7 @@ describe RDF::Reasoner::RDFS do
 
     it "uses supplied types" do
       expect(RDF::Vocab::FOAF.based_near).not_to be_range_compatible(ex+"a", queryable, types: [RDF::Vocab::FOAF.Agent])
-      expect(RDF::Vocab::FOAF.based_near).to be_range_compatible(ex+"a", queryable, types: [RDF::GEO.SpatialThing])
+      expect(RDF::Vocab::FOAF.based_near).to be_range_compatible(ex+"a", queryable, types: [RDF::Vocab::GEO.SpatialThing])
       expect(RDF.type).to be_range_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMA.Thing])
     end
 
