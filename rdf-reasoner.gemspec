@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
 
   gem.name               = "rdf-reasoner"
   gem.homepage           = "http://github.com/gkellogg/rdf-reasoner"
-  gem.license            = 'Public Domain' if gem.respond_to?(:license=)
+  gem.license            = 'Unlicense'
   gem.summary            = "RDFS/OWL Reasoner for RDF.rb"
 
   gem.authors            = ['Gregg Kellogg']
