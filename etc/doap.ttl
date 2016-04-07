@@ -45,5 +45,5 @@
   dc:creator         <http://greggkellogg.net/foaf#me> ;
   dc:isPartOf        <http://rubygems.org/gems/rdf> .
 
-<http://greggkellogg.net/foaf#me> a foaf:Person, foaf:Agent;
+<http://greggkellogg.net/foaf#me> a foaf:Person, foaf:Agent, dc:Agent;
    foaf:name        "Gregg Kellogg".
