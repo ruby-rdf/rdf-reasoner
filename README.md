@@ -12,6 +12,7 @@ Reasons over RDFS/OWL vocabularies and schema.org to generate statements which a
 * Entail `owl:equivalentProperty` generating an array of terms equivalent to the subject.
 * `domainCompatible?` determines if a particular resource is compatible with the domain definition of a given predicate, based on the intersection of entailed subclasses with the property domain.
 * `rangeCompatible?` determines if a particular resource is compatible with the range definition of a given predicate, based on the intersection of entailed subclasses or literal types with the property domain.
+* adds `entail` and `lint` commands to the `rdf` command line interface
 
 Domain and Range entailment include specific rules for schema.org vocabularies.
 
@@ -68,7 +69,7 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
     require 'rdf/reasoner'
     require 'rdf/turtle'
 
-    RDF::Reasoner.apply(::owl)
+    RDF::Reasoner.apply(:owl)
     graph = RDF::Graph.load("etc/doap.ttl")
     graph.entail!(:equivalentClass)
 

@@ -1,5 +1,6 @@
 require 'rdf'
 require 'rdf/reasoner/extensions'
+require 'rdf/vocab'
 
 module RDF
   ##
@@ -8,6 +9,7 @@ module RDF
   # @see http://www.w3.org/TR/2013/REC-sparql11-entailment-20130321/
   # @author [Gregg Kellogg](http://greggkellogg.net/)
   module Reasoner
+    require 'rdf/reasoner/format'
     autoload :OWL,     'rdf/reasoner/owl'
     autoload :RDFS,    'rdf/reasoner/rdfs'
     autoload :Schema,  'rdf/reasoner/schema'

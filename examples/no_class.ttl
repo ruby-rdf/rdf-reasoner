@@ -1,0 +1,2 @@
+@prefix schema: <http://schema.org/> .
+<foo> a schema:NoSuchClass .
