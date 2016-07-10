@@ -24,7 +24,7 @@ Gem::Specification.new do |gem|
                              the vocabulary ruleset. This can be used to implement
                              SPARQL Entailment Regimes.).gsub(/\s+/m, ' ')
 
-  gem.required_ruby_version      = '>= 2.0'
+  gem.required_ruby_version      = '>= 2.2.2'
   gem.requirements               = []
   gem.add_runtime_dependency     'rdf',             '~> 2.0'
   gem.add_runtime_dependency     'rdf-vocab',       '~> 2.0'
