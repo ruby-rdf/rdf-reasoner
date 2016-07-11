@@ -239,7 +239,7 @@ describe RDF::Reasoner::Schema do
         "schema:Text with datatyped literal" => %(
           @prefix schema: <http://schema.org/> .
           @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-          <foo> a schema:Thing; schema:activeIngredient "foo"^^xsd:token .
+          <foo> a schema:Thing; schema:recipeIngredient "foo"^^xsd:token .
         ),
         "schema:URL with non-conforming plain literal" => %(
           @prefix schema: <http://schema.org/> .
