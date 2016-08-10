@@ -30,7 +30,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'rdf-vocab',       '~> 2.0'
   gem.add_runtime_dependency     'rdf-xsd',         '~> 2.0'
 
-  gem.add_runtime_dependency     'rdf-spec',        '~> 2.0'
+  gem.add_development_dependency 'rdf-spec',        '~> 2.0'
   gem.add_development_dependency 'json-ld',         '~> 2.0'
   gem.add_development_dependency 'rdf-turtle',      '~> 2.0'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.4'
