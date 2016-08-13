@@ -19,7 +19,6 @@ group :development, :test do
 end
 
 group :debug do
-  gem "wirble"
   gem "redcarpet",      platforms: :ruby
   gem "byebug",         platforms: :mri
 end
