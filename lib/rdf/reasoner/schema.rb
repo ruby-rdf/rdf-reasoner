@@ -121,7 +121,7 @@ module RDF::Reasoner
           true # Special case for schema boolean resources
         elsif ranges.include?(RDF::Vocab::SCHEMA.URL) && resource.uri?
           true # schema:URL matches URI resources
-        elsif ranges.include?(RDF::Vocab::SCHEMA.Text) && resource.uri?
+        elsif ranges == [RDF::Vocab::SCHEMA.Text] && resource.uri?
           # Allowed if resource is untyped
           entailed_types(resource, queryable, options).empty?
         elsif literal_range?(ranges)
