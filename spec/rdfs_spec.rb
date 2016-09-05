@@ -24,6 +24,7 @@ describe RDF::Reasoner::RDFS do
           subject {RDF::Statement(RDF::URI("a"), RDF.type, cls)}
           let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:subClassOf)).to include(*results)}
+          specify {expect(subject.entail(:subClassOf)).to all(be_inferred)}
           specify {expect {|b| subject.entail(:subClassOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
@@ -65,6 +66,7 @@ describe RDF::Reasoner::RDFS do
           subject {RDF::Statement(RDF::URI("a"), RDF.type, cls)}
           let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:subClass)).to be_empty}
+          specify {expect(subject.entail(:subClass)).to all(be_inferred)}
           specify {expect {|b| subject.entail(:subClass, &b)}.not_to yield_control}
         end
 
@@ -103,6 +105,7 @@ describe RDF::Reasoner::RDFS do
           subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), r, RDF::URI("b"))}}
           specify {expect(subject.entail(:subPropertyOf)).to include(*results)}
+          specify {expect(subject.entail(:subPropertyOf)).to all(be_inferred)}
           specify {expect {|b| subject.entail(:subPropertyOf, &b)}.to yield_control.at_least(entails.length)}
         end
 
@@ -143,6 +146,7 @@ describe RDF::Reasoner::RDFS do
           subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:domain)).to include(*results)}
+          specify {expect(subject.entail(:domain)).to all(be_inferred)}
           specify {expect {|b| subject.entail(:domain, &b)}.to yield_control.at_least(entails.length)}
         end
 
@@ -183,6 +187,7 @@ describe RDF::Reasoner::RDFS do
           subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {entails.map {|r| RDF::Statement(RDF::URI("b"), RDF.type, r)}}
           specify {expect(subject.entail(:range)).to include(*results)}
+          specify {expect(subject.entail(:range)).to all(be_inferred)}
           specify {expect {|b| subject.entail(:range, &b)}.to yield_control.at_least(entails.length)}
         end
 
