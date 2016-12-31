@@ -33,8 +33,7 @@ describe RDF::Reasoner::Format do
     end
 
     it "lints" do
-      expect {RDF::CLI.exec(["lint", ttl], format: :ttl, output: capture)}.to write.to(:output)
-      expect(capture.string).not_to be_empty
+      expect {RDF::CLI.exec(["lint", ttl], format: :ttl)}.to write(/Linted in .* seconds/).to(:output)
     end
   end
 end
