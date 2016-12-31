@@ -24,6 +24,7 @@ describe RDF::Reasoner::OWL do
           subject {RDF::Statement(RDF::URI("a"), RDF.type, cls)}
           let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), RDF.type, r)}}
           specify {expect(subject.entail(:equivalentClass)).to include(*results)}
+          specify {expect(subject.entail(:equivalentClass)).to all(be_inferred)}
           specify {expect {|b| subject.entail(:equivalentClass, &b)}.to yield_control.at_least(entails.length)}
         end
 
@@ -65,6 +66,7 @@ describe RDF::Reasoner::OWL do
           subject {RDF::Statement(RDF::URI("a"), prop, RDF::URI("b"))}
           let(:results) {entails.map {|r| RDF::Statement(RDF::URI("a"), r, RDF::URI("b"))}}
           specify {expect(subject.entail(:equivalentProperty)).to include(*results)}
+          specify {expect(subject.entail(:equivalentProperty)).to all(be_inferred)}
           specify {expect {|b| subject.entail(:equivalentProperty, &b)}.to yield_control.at_least(entails.length)}
         end
 

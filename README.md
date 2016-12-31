@@ -98,10 +98,13 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
       end
     end
 
+## Command-Line interface
+The `rdf` command-line interface is extended with `entail` and `lint` commands. `Entail` can be used in combination, with `serialize` to generate an output graph representation including entailed triples.
+
 ## Dependencies
 
-* [Ruby](http://ruby-lang.org/) (>= 2.0)
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 2.0)
+* [Ruby](http://ruby-lang.org/) (>= 2.2.2)
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 2.1.1)
 
 ## Mailing List
 

@@ -98,6 +98,18 @@ describe RDF::Reasoner::Schema do
           @prefix schema: <http://schema.org/> .
           <foo> schema:height <dist> . <dist> a schema:Distance; schema:name "20 3/4 inches" .
         ),
+        "schema:CreativeWork with itemListElement (IRI)" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> schema:itemListElement <obj> . <obj> a schema:CreativeWork .
+        ),
+        "schema:CreativeWork with itemListElement (BNode)" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> schema:itemListElement [ a schema:CreativeWork ] .
+        ),
+        "text literal with itemListElement" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> schema:itemListElement "Foo" .
+        ),
       }.each do |name, input|
         it name do
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
@@ -187,6 +199,7 @@ describe RDF::Reasoner::Schema do
         end
       end
     end
+
     context "object range violations" do
       {
         "object of wrong type" => %(
@@ -239,7 +252,7 @@ describe RDF::Reasoner::Schema do
         "schema:Text with datatyped literal" => %(
           @prefix schema: <http://schema.org/> .
           @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-          <foo> a schema:Thing; schema:activeIngredient "foo"^^xsd:token .
+          <foo> a schema:Thing; schema:recipeIngredient "foo"^^xsd:token .
         ),
         "schema:URL with non-conforming plain literal" => %(
           @prefix schema: <http://schema.org/> .
@@ -248,6 +261,10 @@ describe RDF::Reasoner::Schema do
         "schema:Boolean with non-conforming plain literal" => %(
           @prefix schema: <http://schema.org/> .
           <foo> a schema:CreativeWork; schema:isFamilyFriendly "bar" .
+        ),
+        "date with itemListElement" => %(
+          @prefix schema: <http://schema.org/> .
+          <foo> schema:itemListElement "2016-08-22"^^schema:Date .
         ),
       }.each do |name, input|
         it name do

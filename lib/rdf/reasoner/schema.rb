@@ -27,13 +27,7 @@ module RDF::Reasoner
       domains = Array(self.domainIncludes) - [RDF::OWL.Thing]
 
       # Fully entailed types of the resource
-      types = options.fetch(:types) do
-        queryable.query(:subject => resource, :predicate => RDF.type).
-          map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
-          flatten.
-          uniq.
-          compact
-      end unless domains.empty?
+      types = entailed_types(resource, queryable, options) unless domains.empty?
 
       # Every domain must match some entailed type
       resource_acceptable = Array(types).empty? || domains.any? {|d| types.include?(d)}
@@ -109,7 +103,7 @@ module RDF::Reasoner
               resource.datatype == RDF::XSD.anyURI ||
               resource.plain? && RDF::Literal::AnyURI.new(resource.value).valid?
             else
-              # If this is an XSD range, look for appropriate literal
+              # If may be an XSD range, look for appropriate literal
               if range.start_with?(RDF::XSD.to_s)
                 if resource.datatype == RDF::URI(range)
                   true
@@ -127,28 +121,14 @@ module RDF::Reasoner
           true # Special case for schema boolean resources
         elsif ranges.include?(RDF::Vocab::SCHEMA.URL) && resource.uri?
           true # schema:URL matches URI resources
-        elsif ranges.include?(RDF::Vocab::SCHEMA.Text) && resource.uri?
+        elsif ranges == [RDF::Vocab::SCHEMA.Text] && resource.uri?
           # Allowed if resource is untyped
-          # Fully entailed types of the resource
-          types = options.fetch(:types) do
-            queryable.query(:subject => resource, :predicate => RDF.type).
-              map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
-              flatten.
-              uniq.
-              compact
-          end
-          types.empty?
+          entailed_types(resource, queryable, options).empty?
         elsif literal_range?(ranges)
           false # If resource isn't literal, this is a range violation
         else
           # Fully entailed types of the resource
-          types = options.fetch(:types) do
-            queryable.query(:subject => resource, :predicate => RDF.type).
-              map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
-              flatten.
-              uniq.
-              compact
-          end
+          types = entailed_types(resource, queryable, options)
 
           # Every range must match some entailed type
           resource_acceptable = Array(types).empty? || ranges.any? {|d| types.include?(d)}
@@ -190,6 +170,18 @@ module RDF::Reasoner
     end
 
     def self.included(mod)
+    end
+
+    private
+    # Fully entailed types
+    def entailed_types(resource, queryable, options = {})
+      options.fetch(:types) do
+        queryable.query(:subject => resource, :predicate => RDF.type).
+          map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
+          flatten.
+          uniq.
+          compact
+      end
     end
   end
 
