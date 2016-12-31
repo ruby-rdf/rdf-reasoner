@@ -58,7 +58,7 @@ module RDF::Reasoner
         if self.predicate == RDF.type
           if term = (RDF::Vocabulary.find_term(self.object) rescue nil)
             term._entail_subClassOf do |t|
-              statements << RDF::Statement(self.to_hash.merge(object: t, inferred: true))
+              statements << RDF::Statement(self.to_h.merge(object: t, inferred: true))
             end
           end
           #$stderr.puts("subClassf(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
@@ -127,7 +127,7 @@ module RDF::Reasoner
         statements = []
         if term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term._entail_subPropertyOf do |t|
-            statements << RDF::Statement(self.to_hash.merge(predicate: t, inferred: true))
+            statements << RDF::Statement(self.to_h.merge(predicate: t, inferred: true))
           end
           #$stderr.puts("subPropertyOf(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
         end
@@ -146,7 +146,7 @@ module RDF::Reasoner
         statements = []
         if term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term.domain.each do |t|
-            statements << RDF::Statement(self.to_hash.merge(predicate: RDF.type, object: t, inferred: true))
+            statements << RDF::Statement(self.to_h.merge(predicate: RDF.type, object: t, inferred: true))
           end
         end
         #$stderr.puts("domain(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
@@ -165,7 +165,7 @@ module RDF::Reasoner
         statements = []
         if object.resource? && term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term.range.each do |t|
-            statements << RDF::Statement(self.to_hash.merge(subject: self.object, predicate: RDF.type, object: t, inferred: true))
+            statements << RDF::Statement(self.to_h.merge(subject: self.object, predicate: RDF.type, object: t, inferred: true))
           end
         end
         #$stderr.puts("range(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}")

@@ -26,7 +26,7 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version      = '>= 2.2.2'
   gem.requirements               = []
-  gem.add_runtime_dependency     'rdf',             '~> 2.0'
+  gem.add_runtime_dependency     'rdf',             '~> 2.1', '>= 2.1.1'
   gem.add_runtime_dependency     'rdf-vocab',       '~> 2.0'
   gem.add_runtime_dependency     'rdf-xsd',         '~> 2.0'
 

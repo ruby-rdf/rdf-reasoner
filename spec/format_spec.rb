@@ -25,13 +25,16 @@ describe RDF::Reasoner::Format do
   describe ".cli_commands" do
     require 'rdf/cli'
     let(:ttl) {File.expand_path("../../etc/doap.ttl", __FILE__)}
+    let(:capture) {StringIO.new}
 
     it "entails" do
-      expect {RDF::CLI.exec(["entail", ttl])}.to write.to(:output)
+      expect {RDF::CLI.exec(["entail", "serialize", ttl], format: :ttl, output: capture)}.to write.to(:output)
+      expect(capture.string).not_to be_empty
     end
 
     it "lints" do
-      expect {RDF::CLI.exec(["lint", ttl])}.to write.to(:output)
+      expect {RDF::CLI.exec(["lint", ttl], format: :ttl, output: capture)}.to write.to(:output)
+      expect(capture.string).not_to be_empty
     end
   end
 end

@@ -2,7 +2,7 @@ $:.unshift "."
 require 'spec_helper'
 require 'rdf/spec'
 
-describe RDF::Turtle::Reader do
+describe RDF::Reasoner do
   # W3C RDF Semantics Test suite from https://dvcs.w3.org/hg/rdf/file/default/rdf-mt/tests/
   describe "w3c turtle tests" do
     require 'suite_helper'
@@ -24,10 +24,10 @@ describe RDF::Turtle::Reader do
               # FIXME, graphs aren't equivalent, but action should entail result, either of which may be false
               begin
                 if t.positive_test?
-                  pending "PositiveEntailment"
+                  skip "PositiveEntailment"
                   action_graph.entail!(:rdfs)
                 else
-                  pending "NegativeEntailment"
+                  skip "NegativeEntailment"
                 end
               #rescue
               #  if t.action == false
