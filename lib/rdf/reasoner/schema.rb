@@ -109,7 +109,7 @@ module RDF::Reasoner
                   true
                 else
                   # Valid if cast as datatype
-                  resource.plain? && RDF::Literal(resource.value, :datatype => RDF::URI(range)).valid?
+                  resource.plain? && RDF::Literal(resource.value, datatype: RDF::URI(range)).valid?
                 end
               else
                 # Otherwise, presume that the range refers to a typed resource. This is allowed if the value is a plain literal
@@ -176,7 +176,7 @@ module RDF::Reasoner
     # Fully entailed types
     def entailed_types(resource, queryable, options = {})
       options.fetch(:types) do
-        queryable.query(:subject => resource, :predicate => RDF.type).
+        queryable.query(subject: resource, predicate: RDF.type).
           map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
           flatten.
           uniq.
