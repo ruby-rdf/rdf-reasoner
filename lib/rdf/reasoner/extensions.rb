@@ -178,7 +178,7 @@ module RDF
       messages = {}
 
       # Check for defined classes in known vocabularies
-      self.query(:predicate => RDF.type) do |stmt|
+      self.query(predicate: RDF.type) do |stmt|
         vocab = RDF::Vocabulary.find(stmt.object)
         term = (RDF::Vocabulary.find_term(stmt.object) rescue nil) if vocab
         pname = term ? term.pname : stmt.object.pname
@@ -200,6 +200,13 @@ module RDF
         term = (RDF::Vocabulary.find_term(stmt.predicate) rescue nil) if vocab
         pname = term ? term.pname : stmt.predicate.pname
 
+        # Must be a valid statement
+        begin
+          stmt.validate!
+        rescue
+          ((messages[:statement] ||= {})[pname] ||= []) << "Triple #{stmt.to_ntriples} is invalid"
+        end
+
         # Must be a defined property
         if term && term.property?
           # Warn against using a deprecated term
@@ -217,7 +224,7 @@ module RDF
           uniq.
           compact
 
-        unless term.domain_compatible?(stmt.subject, self, :types => resource_types[stmt.subject])
+        unless term.domain_compatible?(stmt.subject, self, types: resource_types[stmt.subject])
           ((messages[:property] ||= {})[pname] ||= []) << if term.respond_to?(:domain)
            "Subject #{show_resource(stmt.subject)} not compatible with domain (#{Array(term.domain).map {|d| d.pname|| d}.join(',')})"
           else
@@ -232,7 +239,7 @@ module RDF
           uniq.
           compact if stmt.object.resource?
 
-        unless term.range_compatible?(stmt.object, self, :types => resource_types[stmt.object])
+        unless term.range_compatible?(stmt.object, self, types: resource_types[stmt.object])
           ((messages[:property] ||= {})[pname] ||= []) << if term.respond_to?(:range)
            "Object #{show_resource(stmt.object)} not compatible with range (#{Array(term.range).map {|d| d.pname|| d}.join(',')})"
           else

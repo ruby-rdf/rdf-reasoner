@@ -192,7 +192,7 @@ module RDF::Reasoner
 
         # Fully entailed types of the resource
         types = options.fetch(:types) do
-          queryable.query(:subject => resource, :predicate => RDF.type).
+          queryable.query(subject: resource, predicate: RDF.type).
             map {|s| (t = (RDF::Vocabulary.find_term(s.object)) rescue nil) && t.entail(:subClassOf)}.
             flatten.
             uniq.
@@ -274,7 +274,7 @@ module RDF::Reasoner
         else
           # Fully entailed types of the resource
           types = options.fetch(:types) do
-            queryable.query(:subject => resource, :predicate => RDF.type).
+            queryable.query(subject: resource, predicate: RDF.type).
               map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
               flatten.
               uniq.

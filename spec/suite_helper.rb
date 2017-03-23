@@ -76,14 +76,16 @@ module Fixtures
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "mf": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#",
         "mq": "http://www.w3.org/2001/sw/DataAccess/tests/test-query#",
+        "rdft": "http://www.w3.org/ns/rdftest#",
     
         "comment": "rdfs:comment",
         "entries": {"@id": "mf:entries", "@container": "@list"},
         "name": "mf:name",
         "action": {"@type": "@id"},
         "result": {"@type": "@id"},
-        "recognizedDatatypes": {"@container": "@list"},
-        "unrecognizedDatatypes": {"@container": "@list"},
+        "result_bool": {"@id": "result", "@type": "xsd:boolean"},
+        "recognizedDatatypes": {"@type": "@id", "@container": "@list"},
+        "unrecognizedDatatypes": {"@type": "@id", "@container": "@list"},
         "approval": {"@id": "rdft:approval", "@type": "@vocab"}
       },
       "@type": "mf:Manifest",
@@ -130,16 +132,20 @@ module Fixtures
         @input ||= RDF::Util::File.open_file(action) {|f| f.read}
       end
 
+      def result_bool
+        attributes['result_bool'] == "true"
+      end
+
       def result
-        attributes[:result].is_a?(Hash) ? attributes[:result]['@value'] : attributes[:result]
+        attributes['result'] || result_bool
       end
 
       def expected
-        @expected ||= RDF::Util::File.open_file(result) {|f| f.read}
+        @expected ||= RDF::Util::File.open_file(result) {|f| f.read} if result.is_a?(String)
       end
       
       def entailment?
-        Array(attributes['@type']).join(" ").match(/Entailment/)
+        !!Array(attributes['@type']).join(" ").match(/Entailment/)
       end
 
       def positive_test?
