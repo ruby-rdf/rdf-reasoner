@@ -6,6 +6,7 @@ require 'simplecov'
 SimpleCov.start
 require 'rspec'
 require 'matchers'
+require 'rdf/spec/matchers'
 require 'json/ld'
 require 'rdf/reasoner'
 require 'rdf/turtle'
@@ -13,9 +14,19 @@ require 'rdf/vocab'
 require 'rdf/xsd'
 
 ::RSpec.configure do |c|
-  c.filter_run :focus => true
+  c.filter_run focus: true
   c.run_all_when_everything_filtered = true
   c.exclusion_filter = {
-    :ruby => lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version.to_s}/) },
+    ruby: lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version.to_s}/) },
   }
+end
+
+# Remove vocabulary from RDF::Vocabulary
+class RDF::Vocabulary
+  class << self
+    def remove(vocab)
+      @@subclasses.delete_if {|klass| klass = vocab}
+      @@uris.delete(vocab)
+    end
+  end
 end

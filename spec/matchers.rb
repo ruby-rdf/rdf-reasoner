@@ -25,43 +25,6 @@ end
 
 Info = Struct.new(:about, :coment, :trace, :input, :result, :action, :expected)
 
-RSpec::Matchers.define :be_equivalent_graph do |expected, info|
-  match do |actual|
-    @info = if info.respond_to?(:input)
-      info
-    elsif info.is_a?(Hash)
-      identifier = info[:identifier] || info[:about]
-      trace = info[:trace]
-      if trace.is_a?(Array)
-        trace = trace.map {|s| s.dup.force_encoding(Encoding::UTF_8)}.join("\n")
-      end
-      Info.new(identifier, info[:comment] || "", trace)
-    else
-      Info.new(info, info.to_s)
-    end
-    @expected = normalize(expected)
-    @actual = normalize(actual)
-    @actual.isomorphic_with?(@expected) rescue false
-  end
-
-  failure_message do |actual|
-    info = @info.respond_to?(:comment) ? @info.comment : @info.inspect
-    if @expected.is_a?(RDF::Graph) && @actual.size != @expected.size
-      "Graph entry count differs:\nexpected: #{@expected.size}\nactual:   #{@actual.size}"
-    elsif @expected.is_a?(Array) && @actual.size != @expected.length
-      "Graph entry count differs:\nexpected: #{@expected.length}\nactual:   #{@actual.size}"
-    else
-      "Graph differs"
-    end +
-    "\n#{info + "\n" unless info.empty?}" +
-    (@info.action ? "Input file: #{@info.action}\n" : "") +
-    (@info.result ? "Result file: #{@info.result}\n" : "") +
-    "Unsorted Expected:\n#{@expected.dump(:ntriples, standard_prefixes:  true)}" +
-    "Unsorted Results:\n#{@actual.dump(:ntriples, standard_prefixes:  true)}" +
-    (@info.trace ? "\nDebug:\n#{@info.trace}" : "")
-  end  
-end
-
 RSpec::Matchers.define :have_errors do |errors|
   match do |actual|
     return false unless actual.keys == errors.keys
@@ -86,5 +49,21 @@ RSpec::Matchers.define :have_errors do |errors|
 
   failure_message_when_negated do |actual|
     "expected errors not to match #{errors.to_json(JSON::LD::JSON_STATE)}"
+  end
+end
+
+RSpec::Matchers.define :be_valid do |info|
+  match do |actual|
+    actual.valid?
+  end
+
+  failure_message do |actual|
+    "Exprected Graph to be valid\n" +
+    "Info:\n#{info.logger}"
+  end
+
+  failure_message_when_negated do |actual|
+    "Exprected Graph not to be valid\n" +
+    "Info:\n#{info.logger}"
   end
 end

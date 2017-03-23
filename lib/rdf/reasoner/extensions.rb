@@ -204,7 +204,7 @@ module RDF
         begin
           stmt.validate!
         rescue
-          ((messages[:statement] ||= {})[pname] ||= []) << $!.message
+          ((messages[:statement] ||= {})[pname] ||= []) << "Triple #{stmt.to_ntriples} is invalid"
         end
 
         # Must be a defined property

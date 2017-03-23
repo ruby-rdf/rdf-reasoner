@@ -9,7 +9,7 @@ describe RDF::Queryable, "#lint" do
       "undefined class" => [
         %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:NoSuchClass .
+          <http://example/foo> a schema:NoSuchClass .
         ),
         {
           class: {"schema:NoSuchClass" => ["No class definition found"]},
@@ -18,7 +18,7 @@ describe RDF::Queryable, "#lint" do
       "undefined property" => [
         %(
           @prefix schema: <http://schema.org/> .
-          <foo> schema:noSuchProperty "bar" .
+          <http://example/foo> schema:noSuchProperty "bar" .
         ),
         {
           property: {"schema:noSuchProperty" => ["No property definition found"]},
@@ -27,14 +27,14 @@ describe RDF::Queryable, "#lint" do
       "undefined class from undefined vocabulary" => [
         %(
           @prefix ex: <http://example.com/vocab#> .
-          <foo> a ex:Foo .
+          <http://example/foo> a ex:Foo .
         ),
         {}
       ],
       "undefined property from undefined vocabulary" => [
         %(
           @prefix ex: <http://example.com/vocab#> .
-          <foo> ex:shortTitle "bar" .
+          <http://example/foo> ex:shortTitle "bar" .
         ),
         {}
       ],
@@ -51,7 +51,7 @@ describe RDF::Queryable, "#lint" do
       "type not defined" => [
         %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:Person; schema:acceptedOffer [a schema:Offer] .
+          <http://example/foo> a schema:Person; schema:acceptedOffer [a schema:Offer] .
         ),
         {
           property: {"schema:acceptedOffer" => [/Subject .* not compatible with domainIncludes \(schema:Order\)/]},
@@ -70,7 +70,7 @@ describe RDF::Queryable, "#lint" do
       "object of wrong type" => [
         %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:Order; schema:acceptedOffer [a schema:Thing] .
+          <http://example/foo> a schema:Order; schema:acceptedOffer [a schema:Thing] .
         ),
         {
           property: {"schema:acceptedOffer" => [/Object .* not compatible with rangeIncludes \(schema:Offer\)/]},
@@ -79,7 +79,7 @@ describe RDF::Queryable, "#lint" do
       #"object range with literal" => [
       #  %(
       #    @prefix schema: <http://schema.org/> .
-      #    <foo> a schema:Order; schema:acceptedOffer "foo" .
+      #    <http://example/foo> a schema:Order; schema:acceptedOffer "foo" .
       #  ),
       #  {
       #    property: {"schema:acceptedOffer" => [/Object .* not compatible with rangeIncludes \(schema:Offer\)/]},
@@ -88,7 +88,7 @@ describe RDF::Queryable, "#lint" do
       "xsd:nonNegativeInteger expected with conforming plain literal" => [
         %(
           @prefix sioc: <http://rdfs.org/sioc/ns#> .
-          <foo> sioc:num_authors "bar" .
+          <http://example/foo> sioc:num_authors "bar" .
         ),
         {
           property: {"sioc:num_authors" => [/Object .* not compatible with range \(xsd:nonNegativeInteger\)/]},
@@ -97,7 +97,7 @@ describe RDF::Queryable, "#lint" do
       "xsd:nonNegativeInteger expected with non-equivalent datatyped literal" => [
         %(
           @prefix sioc: <http://rdfs.org/sioc/ns#> .
-          <foo> sioc:num_authors 1 .
+          <http://example/foo> sioc:num_authors 1 .
         ),
         {
           property: {"sioc:num_authors" => [/Object .* not compatible with range \(xsd:nonNegativeInteger\)/]},
@@ -107,7 +107,7 @@ describe RDF::Queryable, "#lint" do
         %(
           @prefix schema: <http://schema.org/> .
           @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-          <foo> a schema:Thing; schema:name "foo"^^xsd:token .
+          <http://example/foo> a schema:Thing; schema:name "foo"^^xsd:token .
         ),
         {
           property: {"schema:name" => [/Object .* not compatible with rangeIncludes \(schema:Text\)/]},
@@ -116,7 +116,7 @@ describe RDF::Queryable, "#lint" do
       "schema:URL with non-conforming plain literal" => [
         %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:Thing; schema:url "foo" .
+          <http://example/foo> a schema:Thing; schema:url "foo" .
         ),
         {
           property: {"schema:url" => [/Object .* not compatible with rangeIncludes \(schema:URL\)/]},
@@ -125,7 +125,7 @@ describe RDF::Queryable, "#lint" do
       "schema:Boolean with non-conforming plain literal" => [
         %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:CreativeWork; schema:isFamilyFriendly "bar" .
+          <http://example/foo> a schema:CreativeWork; schema:isFamilyFriendly "bar" .
         ),
         {
           property: {"schema:isFamilyFriendly" => [/Object .* not compatible with rangeIncludes \(schema:Boolean\)/]},
@@ -144,7 +144,7 @@ describe RDF::Queryable, "#lint" do
       "members superseded by member" => [
         %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:Organization; schema:members "Manny" .
+          <http://example/foo> a schema:Organization; schema:members "Manny" .
         ),
         {
           property: {"schema:members" => ["Term is superseded by schema:member"]},
@@ -162,36 +162,36 @@ describe RDF::Queryable, "#lint" do
     {
       "schema:Text with plain literal" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:Thing; schema:name "bar" .
+        <http://example/foo> a schema:Thing; schema:name "bar" .
       ),
       "schema:Text with language-tagged literal" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:Thing; schema:name "bar"@en .
+        <http://example/foo> a schema:Thing; schema:name "bar"@en .
       ),
       "schema:URL with matching plain literal" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:Thing; schema:url "http://example/" .
+        <http://example/foo> a schema:Thing; schema:url "http://example/" .
       ),
       "schema:URL with anyURI" => %(
         @prefix schema: <http://schema.org/> .
         @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-        <foo> a schema:Thing; schema:url "http://example/"^^xsd:anyURI .
+        <http://example/foo> a schema:Thing; schema:url "http://example/"^^xsd:anyURI .
       ),
       "schema:Boolean with matching plain literal" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:CreativeWork; schema:isFamilyFriendly "true" .
+        <http://example/foo> a schema:CreativeWork; schema:isFamilyFriendly "true" .
       ),
       "schema:Boolean with boolean" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:CreativeWork; schema:isFamilyFriendly true .
+        <http://example/foo> a schema:CreativeWork; schema:isFamilyFriendly true .
       ),
       "schema:Boolean with schema:True" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:CreativeWork; schema:isFamilyFriendly schema:True .
+        <http://example/foo> a schema:CreativeWork; schema:isFamilyFriendly schema:True .
       ),
       "schema:Boolean with schema:False" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:CreativeWork; schema:isFamilyFriendly schema:False .
+        <http://example/foo> a schema:CreativeWork; schema:isFamilyFriendly schema:False .
       ),
     }.each do |name, input|
       it name do
@@ -205,7 +205,7 @@ describe RDF::Queryable, "#lint" do
     {
       "one type of several" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:CreativeWork; schema:audience [a schema:Audience] .
+        <http://example/foo> a schema:CreativeWork; schema:audience [a schema:Audience] .
       )
     }.each do |name, input|
       it name do
@@ -219,20 +219,20 @@ describe RDF::Queryable, "#lint" do
     {
       "one type of several" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:Action; schema:agent [a schema:Person] .
+        <http://example/foo> a schema:Action; schema:agent [a schema:Person] .
       ),
       "xsd:nonNegativeInteger expected matching datatyped literal" => %(
         @prefix sioc: <http://rdfs.org/sioc/ns#> .
         @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-        <foo> sioc:num_authors "1"^^xsd:nonNegativeInteger .
+        <http://example/foo> sioc:num_authors "1"^^xsd:nonNegativeInteger .
       ),
       "xsd:nonNegativeInteger expected with conforming plain literal" => %(
         @prefix sioc: <http://rdfs.org/sioc/ns#> .
-        <foo> sioc:num_authors "1" .
+        <http://example/foo> sioc:num_authors "1" .
       ),
       "schema:URL with language-tagged literal" => %(
         @prefix schema: <http://schema.org/> .
-        <foo> a schema:Thing; schema:url "http://example/"@en .
+        <http://example/foo> a schema:Thing; schema:url "http://example/"@en .
       )
     }.each do |name, input|
       it name do
@@ -247,7 +247,7 @@ describe RDF::Queryable, "#lint" do
       "Cryptography Users" => {
         input: %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:Organization;
+          <http://example/foo> a schema:Organization;
             schema:name "Cryptography Users";
             schema:member [
               a schema:OrganizationRole;
@@ -263,7 +263,7 @@ describe RDF::Queryable, "#lint" do
       "Inconsistent properties" => {
         input: %(
           @prefix schema: <http://schema.org/> .
-          <foo> a schema:Organization;
+          <http://example/foo> a schema:Organization;
             schema:name "Cryptography Users";
             schema:member [
               a schema:OrganizationRole;
@@ -296,7 +296,7 @@ describe RDF::Queryable, "#lint" do
         input: %(
           @prefix schema: <http://schema.org/> .
 
-          <Review> a schema:Review;
+          <http://example/Review> a schema:Review;
              schema:creator ([a schema:Person; schema:name "John Doe"]) .
         ),
         expected_errors: {}
