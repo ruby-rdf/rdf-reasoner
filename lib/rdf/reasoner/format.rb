@@ -34,9 +34,9 @@ module RDF::Reasoner
           lambda: ->(argv, opts) do
             RDF::Reasoner.apply(:rdfs, :owl, :schema)
             start = Time.now
-            # Messages added to options for appropriate display
-            options[:messages].merge!(RDF::CLI.repository.lint)
-            $opts[:output].puts "Linter responded with #{options[:messages].empty? ? 'no' : ''} messages."
+            # Messages added to opts for appropriate display
+            opts[:messages].merge!(RDF::CLI.repository.lint)
+            opts[:output].puts "Linter responded with #{opts[:messages].empty? ? 'no' : ''} messages."
             secs = Time.new - start
             opts[:logger].info "\nLinted in #{secs} seconds."
           end
