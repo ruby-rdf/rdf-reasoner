@@ -326,6 +326,25 @@ describe RDF::Reasoner::RDFS do
           end
         end
       end
+
+      context "GS1" do
+        {
+          "langString" => %(
+            <foo> gs1:organizationName "GS1 Denmark"@en .
+          ),
+        }.each do |name, input|
+          it name do
+            input = %(
+              @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+              @prefix gs1: <http://gs1.org/voc/> .
+            ) + input
+            graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
+            statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
+            expect(RDF::Vocabulary.find_term(statement.predicate)).to be_range_compatible(statement.object, graph)
+          end
+        end
+      end
     end
 
     it "uses supplied types" do
