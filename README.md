@@ -143,6 +143,6 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [SPARQL Query]:     http://www.w3.org/TR/2013/REC-sparql11-query-20130321/
 [SPARQL Entailment]:http://www.w3.org/TR/sparql11-entailment/
 [RDF 1.1]:          http://www.w3.org/TR/rdf11-concepts
-[RDF.rb]:           http://rdf.rubyforge.org/
+[RDF.rb]:           http://www.rubydoc.info/github/ruby-rdf/rdf/
 [RDF Schema]:       http://www.w3.org/TR/rdf-schema/
-[Rack]:             http://rack.rubyforge.org/
+[Rack]:             https://rack.github.io/
