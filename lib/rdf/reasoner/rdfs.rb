@@ -223,6 +223,9 @@ module RDF::Reasoner
           ranges.all? do |range|
             if [RDF::RDFS.Literal, RDF.XMLLiteral, RDF.HTML].include?(range)
               true  # Don't bother checking for validity
+            elsif range == RDF.langString
+              # Value must have a language
+              resource.has_language?
             elsif range.start_with?(RDF::XSD)
               # XSD types are valid if the datatype matches, or they are plain and valid according to the grammar of the range
                 resource.datatype == range ||
