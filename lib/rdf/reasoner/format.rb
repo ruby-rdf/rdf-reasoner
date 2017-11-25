@@ -23,7 +23,7 @@ module RDF::Reasoner
             start, stmt_cnt = Time.now, RDF::CLI.repository.count
             RDF::CLI.repository.entail!
             secs, new_cnt = (Time.new - start), (RDF::CLI.repository.count - stmt_cnt)
-            opts[:logger].info "\nEntailed #{new_cnt} new statements in #{secs} seconds."
+            opts[:logger].info "Entailed #{new_cnt} new statements in #{secs} seconds."
           end
         },
         lint: {
@@ -38,7 +38,7 @@ module RDF::Reasoner
             opts[:messages].merge!(RDF::CLI.repository.lint)
             opts[:output].puts "Linter responded with #{opts[:messages].empty? ? 'no' : ''} messages."
             secs = Time.new - start
-            opts[:logger].info "\nLinted in #{secs} seconds."
+            opts[:logger].info "Linted in #{secs} seconds."
           end
         }
       }
