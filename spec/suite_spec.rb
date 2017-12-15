@@ -4,7 +4,7 @@ require 'rdf/spec'
 
 describe RDF::Reasoner do
   # W3C RDF Semantics Test suite from https://dvcs.w3.org/hg/rdf/file/default/rdf-mt/tests/
-  describe "w3c turtle tests" do
+  describe "w3c reasoner tests" do
     before(:all) {RDF::Reasoner.apply(:rdfs)}
     require 'suite_helper'
 
