@@ -4,7 +4,7 @@ module RDF::Reasoner
   ##
   # Rules for generating RDFS entailment triples
   #
-  # Extends `RDF::Vocabulary::Term` and `RDF::Statement` with specific entailment capabilities
+  # Extends `RDF::URI` and `RDF::Statement` with specific entailment capabilities
   module RDFS
     ##
     # @return [RDF::Util::Cache]
@@ -40,7 +40,7 @@ module RDF::Reasoner
     # @private
     def _entail_subClassOf
       case self
-      when RDF::Vocabulary::Term
+      when RDF::URI, RDF::Node
         unless class? && respond_to?(:subClassOf)
           yield self if block_given?
           return Array(self)
@@ -75,7 +75,7 @@ module RDF::Reasoner
     # @private
     def _entail_subClass
       case self
-      when RDF::Vocabulary::Term
+      when RDF::URI, RDF::Node
         unless class?
           yield self if block_given?
           return Array(self)
@@ -110,7 +110,7 @@ module RDF::Reasoner
     # @private
     def _entail_subPropertyOf
       case self
-      when RDF::Vocabulary::Term
+      when RDF::URI, RDF::Node
         unless property? && respond_to?(:subPropertyOf)
           yield self if block_given?
           return Array(self)
@@ -306,8 +306,8 @@ module RDF::Reasoner
     end
   end
 
-  # Extend Term with these methods
-  ::RDF::Vocabulary::Term.send(:include, RDFS)
+  # Extend URI with these methods
+  ::RDF::URI.send(:include, RDFS)
 
   # Extend Statement with these methods
   ::RDF::Statement.send(:include, RDFS)

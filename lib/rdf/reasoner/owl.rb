@@ -4,7 +4,7 @@ module RDF::Reasoner
   ##
   # Rules for generating OWL entailment triples
   #
-  # Extends `RDF::Vocabulary::Term` and `RDF::Statement` with specific entailment capabilities
+  # Extends `RDF::URI` and `RDF::Statement` with specific entailment capabilities
   module OWL
     ##
     # @return [RDF::Util::Cache]
@@ -26,7 +26,7 @@ module RDF::Reasoner
     # @private
     def _entail_equivalentClass
       case self
-      when RDF::Vocabulary::Term
+      when RDF::URI, RDF::Node
         unless class? && respond_to?(:equivalentClass)
           yield self if block_given?
           return Array(self)
@@ -66,7 +66,7 @@ module RDF::Reasoner
     # @private
     def _entail_equivalentProperty
       case self
-      when RDF::Vocabulary::Term
+      when RDF::URI, RDF::Node
         unless property? && respond_to?(:equivalentProperty)
           yield self if block_given?
           return Array(self)
@@ -128,8 +128,8 @@ module RDF::Reasoner
     end
   end
 
-  # Extend Term with these methods
-  ::RDF::Vocabulary::Term.send(:include, OWL)
+  # Extend URI with these methods
+  ::RDF::URI.send(:include, OWL)
 
   # Extend Statement with these methods
   ::RDF::Statement.send(:include, OWL)

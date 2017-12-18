@@ -7,7 +7,7 @@ module RDF::Reasoner
   ##
   # Rules for generating RDFS entailment triples
   #
-  # Extends `RDF::Vocabulary::Term` with specific entailment capabilities
+  # Extends `RDF::URI` with specific entailment capabilities
   module Schema
 
     ##
@@ -185,6 +185,6 @@ module RDF::Reasoner
     end
   end
 
-  # Extend the Term with this methods
-  ::RDF::Vocabulary::Term.send(:include, Schema)
+  # Extend URI with this methods
+  ::RDF::URI.send(:include, Schema)
 end
