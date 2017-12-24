@@ -242,6 +242,7 @@ module RDF
         if term && term.class?
           # Warn against using a deprecated term
           superseded = term.attributes[:'schema:supersededBy']
+          superseded = superseded.pname if superseded.respond_to?(:pname)
           (messages[:class] ||= {})[pname] = ["Term is superseded by #{superseded}"] if superseded
         else
           (messages[:class] ||= {})[pname] = ["No class definition found"] unless vocab.nil? || [RDF::RDFV, RDF::RDFS].include?(vocab)
@@ -266,6 +267,7 @@ module RDF
         if term && term.property?
           # Warn against using a deprecated term
           superseded = term.attributes[:'schema:supersededBy']
+          superseded = superseded.pname if superseded.respond_to?(:pname)
           (messages[:property] ||= {})[pname] = ["Term is superseded by #{superseded}"] if superseded
         else
           ((messages[:property] ||= {})[pname] ||= []) << "No property definition found" unless vocab.nil?
