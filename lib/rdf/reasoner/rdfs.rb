@@ -41,7 +41,7 @@ module RDF::Reasoner
     def _entail_subClassOf
       case self
       when RDF::URI, RDF::Node
-        unless class? && respond_to?(:subClassOf)
+        unless class?
           yield self if block_given?
           return Array(self)
         end
@@ -111,7 +111,7 @@ module RDF::Reasoner
     def _entail_subPropertyOf
       case self
       when RDF::URI, RDF::Node
-        unless property? && respond_to?(:subPropertyOf)
+        unless property?
           yield self if block_given?
           return Array(self)
         end
@@ -187,23 +187,19 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def domain_compatible_rdfs?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get domains" unless property?
-      if respond_to?(:domain)
-        domains = Array(self.domain) - [RDF::OWL.Thing, RDF::RDFS.Resource]
+      domains = Array(self.domain) - [RDF::OWL.Thing, RDF::RDFS.Resource]
 
-        # Fully entailed types of the resource
-        types = options.fetch(:types) do
-          queryable.query(subject: resource, predicate: RDF.type).
-            map {|s| (t = (RDF::Vocabulary.find_term(s.object)) rescue nil) && t.entail(:subClassOf)}.
-            flatten.
-            uniq.
-            compact
-        end unless domains.empty?
+      # Fully entailed types of the resource
+      types = options.fetch(:types) do
+        queryable.query(subject: resource, predicate: RDF.type).
+          map {|s| (t = (RDF::Vocabulary.find_term(s.object)) rescue nil) && t.entail(:subClassOf)}.
+          flatten.
+          uniq.
+          compact
+      end unless domains.empty?
 
-        # Every domain must match some entailed type
-        Array(types).empty? || domains.all? {|d| types.include?(d)}
-      else
-        true
-      end
+      # Every domain must match some entailed type
+      Array(types).empty? || domains.all? {|d| types.include?(d)}
     end
 
     ##
@@ -218,7 +214,7 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def range_compatible_rdfs?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
-      if respond_to?(:range) && !(ranges = Array(self.range) - [RDF::OWL.Thing, RDF::RDFS.Resource]).empty?
+      if !(ranges = Array(self.range) - [RDF::OWL.Thing, RDF::RDFS.Resource]).empty?
         if resource.literal?
           ranges.all? do |range|
             if [RDF::RDFS.Literal, RDF.XMLLiteral, RDF.HTML].include?(range)

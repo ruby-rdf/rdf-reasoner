@@ -54,7 +54,7 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def range_compatible_schema?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
-      if respond_to?(:rangeIncludes) && !(ranges = Array(self.rangeIncludes) - [RDF::OWL.Thing]).empty?
+      if !(ranges = Array(self.rangeIncludes) - [RDF::OWL.Thing]).empty?
         if resource.literal?
           ranges.any? do |range|
             case range

@@ -27,7 +27,7 @@ module RDF::Reasoner
     def _entail_equivalentClass
       case self
       when RDF::URI, RDF::Node
-        unless class? && respond_to?(:equivalentClass)
+        unless class?
           yield self if block_given?
           return Array(self)
         end
@@ -67,7 +67,7 @@ module RDF::Reasoner
     def _entail_equivalentProperty
       case self
       when RDF::URI, RDF::Node
-        unless property? && respond_to?(:equivalentProperty)
+        unless property?
           yield self if block_given?
           return Array(self)
         end
@@ -98,30 +98,6 @@ module RDF::Reasoner
       end
     end
 
-    ##
-    # EquivalentClass of this term, also populates reverse equivalents.
-    #
-    # When first called, this initializes a cache of reverse terms to terms where the the reverse term is listed as an equivalent of the original term.
-    #
-    # It returns the list of terms which are equivalent to this term however defined.
-    # @return [Array<RDF::Vocabulary::Term>]
-    def equivalentClass
-      raise RDF::Reasoner::Error, "#{self} Can't entail equivalentClass" unless class?
-      Array(self.attributes[:equivalentClass]).map {|t| RDF::Vocabulary.expand_pname(t)}
-    end
-
-    ##
-    # EquivalentProperty of this term, also populates reverse equivalents.
-    #
-    # When first called, this initializes a cache of reverse terms to terms where the the reverse term is listed as an equivalent of the original term.
-    #
-    # It returns the list of terms which are equivalent to this term however defined.
-    # @return [Array<RDF::Vocabulary::Term>]
-    def equivalentProperty
-      raise RDF::Reasoner::Error, "#{self} Can't entail equivalentProperty" unless property?
-      Array(self.attributes[:equivalentProperty]).map {|t| RDF::Vocabulary.expand_pname(t)}
-    end
-    
     def self.included(mod)
       mod.add_entailment :equivalentClass, :_entail_equivalentClass
       mod.add_entailment :equivalentProperty, :_entail_equivalentProperty

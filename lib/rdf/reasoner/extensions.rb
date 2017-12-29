@@ -282,7 +282,7 @@ module RDF
           compact
 
         unless term.domain_compatible?(stmt.subject, self, types: resource_types[stmt.subject])
-          ((messages[:property] ||= {})[pname] ||= []) << if term.respond_to?(:domain)
+          ((messages[:property] ||= {})[pname] ||= []) << if !term.domain.empty?
            "Subject #{show_resource(stmt.subject)} not compatible with domain (#{Array(term.domain).map {|d| d.pname|| d}.join(',')})"
           else
             "Subject #{show_resource(stmt.subject)} not compatible with domainIncludes (#{term.domainIncludes.map {|d| d.pname|| d}.join(',')})"
@@ -297,7 +297,7 @@ module RDF
           compact if stmt.object.resource?
 
         unless term.range_compatible?(stmt.object, self, types: resource_types[stmt.object])
-          ((messages[:property] ||= {})[pname] ||= []) << if term.respond_to?(:range)
+          ((messages[:property] ||= {})[pname] ||= []) << if !term.range.empty?
            "Object #{show_resource(stmt.object)} not compatible with range (#{Array(term.range).map {|d| d.pname|| d}.join(',')})"
           else
             "Object #{show_resource(stmt.object)} not compatible with rangeIncludes (#{term.rangeIncludes.map {|d| d.pname|| d}.join(',')})"
