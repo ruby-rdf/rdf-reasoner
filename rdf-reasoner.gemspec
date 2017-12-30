@@ -31,8 +31,8 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'rdf-xsd',         '~> 3.0'
 
   gem.add_development_dependency 'rdf-spec',        '~> 3.0'
-  #gem.add_development_dependency 'json-ld',         '~> 3.0'
   gem.add_development_dependency 'rdf-turtle',      '~> 3.0'
+  #gem.add_development_dependency 'json-ld',         '~> 3.0'
   gem.add_development_dependency 'json-ld',         '>= 2.2', '< 4.0'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
   gem.add_development_dependency 'rspec',           '~> 3.7'

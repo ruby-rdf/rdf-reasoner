@@ -37,6 +37,7 @@ module RDF::Reasoner
     ##
     # For a Term: yield or return inferred subClassOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
     # For a Statement: if predicate is `rdf:types`, yield or return inferred statements having a subClassOf relationship to the type of this statement
+    # @todo Should be able to entail owl:Restriction, which is a BNode. This should be allowed, and also add BNode values of that node, recursively, similar to SPARQL concise_bounded_description.uu
     # @private
     def _entail_subClassOf
       case self
@@ -58,6 +59,7 @@ module RDF::Reasoner
         if self.predicate == RDF.type
           if term = (RDF::Vocabulary.find_term(self.object) rescue nil)
             term._entail_subClassOf do |t|
+              next if t.node? # Don't entail BNodes
               statements << RDF::Statement(self.to_h.merge(object: t, inferred: true))
             end
           end
@@ -139,6 +141,7 @@ module RDF::Reasoner
 
     ##
     # For a Statement: yield or return inferred statements having an rdf:type of the domain of the statement predicate
+    # @todo Should be able to entail owl:unionOf, which is a BNode. This should be allowed, and also add BNode values of that node, recursively, similar to SPARQL concise_bounded_description.uu
     # @private
     def _entail_domain
       case self
@@ -146,6 +149,7 @@ module RDF::Reasoner
         statements = []
         if term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term.domain.each do |t|
+            next if t.node? # Don't entail BNodes
             statements << RDF::Statement(self.to_h.merge(predicate: RDF.type, object: t, inferred: true))
           end
         end
@@ -158,6 +162,7 @@ module RDF::Reasoner
 
     ##
     # For a Statement: if object is a resource, yield or return inferred statements having an rdf:type of the range of the statement predicate
+    # @todo Should be able to entail owl:unionOf, which is a BNode. This should be allowed, and also add BNode values of that node, recursively, similar to SPARQL concise_bounded_description.uu
     # @private
     def _entail_range
       case self
@@ -165,6 +170,7 @@ module RDF::Reasoner
         statements = []
         if object.resource? && term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term.range.each do |t|
+            next if t.node? # Don't entail BNodes
             statements << RDF::Statement(self.to_h.merge(subject: self.object, predicate: RDF.type, object: t, inferred: true))
           end
         end
@@ -187,7 +193,7 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def domain_compatible_rdfs?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get domains" unless property?
-      domains = Array(self.domain) - [RDF::OWL.Thing, RDF::RDFS.Resource]
+      domains = Array(self.domain).reject(&:node?) - [RDF::OWL.Thing, RDF::RDFS.Resource]
 
       # Fully entailed types of the resource
       types = options.fetch(:types) do
@@ -214,7 +220,7 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def range_compatible_rdfs?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
-      if !(ranges = Array(self.range) - [RDF::OWL.Thing, RDF::RDFS.Resource]).empty?
+      if !(ranges = Array(self.range).reject(&:node?) - [RDF::OWL.Thing, RDF::RDFS.Resource]).empty?
         if resource.literal?
           ranges.all? do |range|
             if [RDF::RDFS.Literal, RDF.XMLLiteral, RDF.HTML].include?(range)

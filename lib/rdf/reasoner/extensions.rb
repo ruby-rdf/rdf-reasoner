@@ -234,6 +234,7 @@ module RDF
 
       # Check for defined classes in known vocabularies
       self.query(predicate: RDF.type) do |stmt|
+        require 'byebug'; byebug if stmt.object.node?
         vocab = RDF::Vocabulary.find(stmt.object)
         term = (RDF::Vocabulary.find_term(stmt.object) rescue nil) if vocab
         pname = term ? term.pname : stmt.object.pname
@@ -282,6 +283,7 @@ module RDF
           compact
 
         unless term.domain_compatible?(stmt.subject, self, types: resource_types[stmt.subject])
+          require 'byebug'; byebug if term.domain.any?(&:node?)
           ((messages[:property] ||= {})[pname] ||= []) << if !term.domain.empty?
            "Subject #{show_resource(stmt.subject)} not compatible with domain (#{Array(term.domain).map {|d| d.pname|| d}.join(',')})"
           else

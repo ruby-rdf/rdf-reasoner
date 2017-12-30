@@ -86,6 +86,13 @@ describe RDF::Reasoner::RDFS do
         end
       end
     end
+
+    it "does not entail a BNode" do
+      s = RDF::Statement(RDF::URI("a"), RDF.type, RDF::Vocab::SKOSXL.Label)
+      s.entail(:subClassOf) do |st|
+        expect(st.object).not_to be_a_node
+      end
+    end
   end unless ENV['CI']
 
   describe :subPropertyOf do
@@ -169,6 +176,13 @@ describe RDF::Reasoner::RDFS do
         end
       end
     end
+
+    it "does not entail a BNode" do
+      s = RDF::Statement(RDF::URI("a"), RDF::Vocab::V.currency, RDF::Literal("USD"))
+      s.entail(:domain) do |st|
+        expect(st.object).not_to be_a_node
+      end
+    end
   end
 
   describe :range do
@@ -210,6 +224,13 @@ describe RDF::Reasoner::RDFS do
         end
       end
     end
+
+    it "does not entail a BNode" do
+      s = RDF::Statement(RDF::URI("a"), RDF::Vocab::V.affiliation, RDF::URI("http://example/ACMECorp"))
+      s.entail(:range) do |st|
+        expect(st.object).not_to be_a_node
+      end
+    end
   end
 
   describe :domain_compatible? do
@@ -249,6 +270,10 @@ describe RDF::Reasoner::RDFS do
         end
       end
     end
+
+    it "is compatible with a BNode domain" do
+      expect(RDF::Vocab::V.address).to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMA.Thing])
+    end
   end
 
   describe :range_compatible? do
@@ -270,6 +295,10 @@ describe RDF::Reasoner::RDFS do
           statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
           expect(RDF::Vocabulary.find_term(statement.predicate)).to be_range_compatible(statement.object, graph)
         end
+      end
+
+      it "is compatible with a BNode range" do
+        expect(RDF::Vocab::V.affiliation).to be_range_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMA.Thing])
       end
 
       context "OGP literal datatypes" do
