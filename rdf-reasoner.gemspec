@@ -26,21 +26,16 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version      = '>= 2.2.2'
   gem.requirements               = []
-  #gem.add_runtime_dependency     'rdf',             '~> 3.0'
-  #gem.add_runtime_dependency     'rdf-vocab',       '~> 3.0'
-  #gem.add_runtime_dependency     'rdf-xsd',         '~> 3.0'
-  gem.add_runtime_dependency     'rdf',             '>= 2.2', '< 4.0'
-  gem.add_runtime_dependency     'rdf-vocab',       '>= 2.2', '< 4.0'
-  gem.add_runtime_dependency     'rdf-xsd',         '>= 2.2', '< 4.0'
+  gem.add_runtime_dependency     'rdf',             '~> 3.0'
+  gem.add_runtime_dependency     'rdf-vocab',       '~> 3.0'
+  gem.add_runtime_dependency     'rdf-xsd',         '~> 3.0'
 
-  #gem.add_development_dependency 'rdf-spec',        '~> 3.0'
+  gem.add_development_dependency 'rdf-spec',        '~> 3.0'
   #gem.add_development_dependency 'json-ld',         '~> 3.0'
-  #gem.add_development_dependency 'rdf-turtle',      '~> 3.0'
-  gem.add_development_dependency 'rdf-spec',        '>= 2.2', '< 4.0'
-  gem.add_development_dependency 'json-ld',         '>= 2.1', '< 4.0'
-  gem.add_development_dependency 'rdf-turtle',      '>= 2.2', '< 4.0'
+  gem.add_development_dependency 'rdf-turtle',      '~> 3.0'
+  gem.add_development_dependency 'json-ld',         '>= 2.2', '< 4.0'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
-  gem.add_development_dependency 'rspec',           '~> 3.5'
-  gem.add_development_dependency 'yard' ,           '~> 0.9'
+  gem.add_development_dependency 'rspec',           '~> 3.7'
+  gem.add_development_dependency 'yard' ,           '~> 0.9.12'
   gem.post_install_message       = nil
 end

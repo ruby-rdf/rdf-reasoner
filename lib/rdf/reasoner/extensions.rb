@@ -2,7 +2,62 @@
 require 'rdf'
 
 module RDF
-  class Vocabulary::Term
+  class URI
+    class << self
+      @@entailments = {}
+
+      ##
+      # Add an entailment method. The method accepts no arguments, and returns or yields an array of values associated with the particular entailment method
+      # @param [Symbol] method
+      # @param [Proc] proc
+      def add_entailment(method, proc)
+        @@entailments[method] = proc
+      end
+    end
+
+    ##
+    # Perform an entailment on this term.
+    #
+    # @param [Symbol] method A registered entailment method
+    # @yield term
+    # @yieldparam [Term] term
+    # @return [Array<Term>]
+    def entail(method, &block)
+      self.send(@@entailments.fetch(method), &block)
+    end
+
+    ##
+    # Determine if the domain of a property term is consistent with the specified resource in `queryable`.
+    #
+    # @param [RDF::Resource] resource
+    # @param [RDF::Queryable] queryable
+    # @param [Hash{Symbol => Object}] options ({})
+    # @option options [Array<RDF::Vocabulary::Term>] :types
+    #   Fully entailed types of resource, if not provided, they are queried
+    def domain_compatible?(resource, queryable, options = {})
+      %w(owl rdfs schema).map {|r| "domain_compatible_#{r}?".to_sym}.all? do |meth|
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
+      end
+    end
+
+    ##
+    # Determine if the range of a property term is consistent with the specified resource in `queryable`.
+    #
+    # Specific entailment regimes should insert themselves before this to apply the appropriate semantic condition
+    #
+    # @param [RDF::Resource] resource
+    # @param [RDF::Queryable] queryable
+    # @param [Hash{Symbol => Object}] options ({})
+    # @option options [Array<RDF::Vocabulary::Term>] :types
+    #   Fully entailed types of resource, if not provided, they are queried
+    def range_compatible?(resource, queryable, options = {})
+      %w(owl rdfs schema).map {|r| "range_compatible_#{r}?".to_sym}.all? do |meth|
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
+      end
+    end
+  end
+
+  class Node
     class << self
       @@entailments = {}
 
@@ -187,6 +242,7 @@ module RDF
         if term && term.class?
           # Warn against using a deprecated term
           superseded = term.attributes[:'schema:supersededBy']
+          superseded = superseded.pname if superseded.respond_to?(:pname)
           (messages[:class] ||= {})[pname] = ["Term is superseded by #{superseded}"] if superseded
         else
           (messages[:class] ||= {})[pname] = ["No class definition found"] unless vocab.nil? || [RDF::RDFV, RDF::RDFS].include?(vocab)
@@ -211,6 +267,7 @@ module RDF
         if term && term.property?
           # Warn against using a deprecated term
           superseded = term.attributes[:'schema:supersededBy']
+          superseded = superseded.pname if superseded.respond_to?(:pname)
           (messages[:property] ||= {})[pname] = ["Term is superseded by #{superseded}"] if superseded
         else
           ((messages[:property] ||= {})[pname] ||= []) << "No property definition found" unless vocab.nil?
@@ -225,7 +282,7 @@ module RDF
           compact
 
         unless term.domain_compatible?(stmt.subject, self, types: resource_types[stmt.subject])
-          ((messages[:property] ||= {})[pname] ||= []) << if term.respond_to?(:domain)
+          ((messages[:property] ||= {})[pname] ||= []) << if !term.domain.empty?
            "Subject #{show_resource(stmt.subject)} not compatible with domain (#{Array(term.domain).map {|d| d.pname|| d}.join(',')})"
           else
             "Subject #{show_resource(stmt.subject)} not compatible with domainIncludes (#{term.domainIncludes.map {|d| d.pname|| d}.join(',')})"
@@ -240,7 +297,7 @@ module RDF
           compact if stmt.object.resource?
 
         unless term.range_compatible?(stmt.object, self, types: resource_types[stmt.object])
-          ((messages[:property] ||= {})[pname] ||= []) << if term.respond_to?(:range)
+          ((messages[:property] ||= {})[pname] ||= []) << if !term.range.empty?
            "Object #{show_resource(stmt.object)} not compatible with range (#{Array(term.range).map {|d| d.pname|| d}.join(',')})"
           else
             "Object #{show_resource(stmt.object)} not compatible with rangeIncludes (#{term.rangeIncludes.map {|d| d.pname|| d}.join(',')})"

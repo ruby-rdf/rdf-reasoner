@@ -7,7 +7,7 @@ module RDF::Reasoner
   ##
   # Rules for generating RDFS entailment triples
   #
-  # Extends `RDF::Vocabulary::Term` with specific entailment capabilities
+  # Extends `RDF::URI` with specific entailment capabilities
   module Schema
 
     ##
@@ -54,7 +54,7 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def range_compatible_schema?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
-      if respond_to?(:rangeIncludes) && !(ranges = Array(self.rangeIncludes) - [RDF::OWL.Thing]).empty?
+      if !(ranges = Array(self.rangeIncludes) - [RDF::OWL.Thing]).empty?
         if resource.literal?
           ranges.any? do |range|
             case range
@@ -185,6 +185,6 @@ module RDF::Reasoner
     end
   end
 
-  # Extend the Term with this methods
-  ::RDF::Vocabulary::Term.send(:include, Schema)
+  # Extend URI with this methods
+  ::RDF::URI.send(:include, Schema)
 end
