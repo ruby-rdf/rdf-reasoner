@@ -16,7 +16,6 @@ Gem::Specification.new do |gem|
   gem.platform           = Gem::Platform::RUBY
   gem.files              = %w(AUTHORS README.md UNLICENSE VERSION) + Dir.glob('lib/**/*.rb')
   gem.require_paths      = %w(lib)
-  gem.has_rdoc           = false
   gem.description        = %(Reasons over RDFS/OWL vocabularies to generate statements
                              which are entailed based on base RDFS/OWL rules along with
                              vocabulary information. It can also be used to ask specific
