@@ -137,6 +137,61 @@ describe RDF::Reasoner::RDFS do
     end
   end
 
+  # XXX this is cribbed from :subClass
+  describe :subProperty do
+    {
+      RDF::Vocab::DC.relation => %w(conformsTo hasFormat hasPart hasVersion
+        isFormatOf isPartOf isReferencedBy isReplacedBy isRequiredBy
+        isVersionOf references relation replaces requires source).map {
+        |t| RDF::Vocab::DC[t] } + %w(derived_from djmix_of mashup_of medley_of
+      remaster_of remix_of sampled_version_of).map {|t| RDF::Vocab::MO[t] },
+      RDF::Vocab::SIOC.space_of => %w(host_of).map {|t| RDF::Vocab::SIOC[t] },
+    }.each do |prop, entails|
+      context prop.pname do
+        describe RDF::Vocabulary::Term do
+          specify {
+            expect(prop.entail(:subProperty).map(&:pname)).to include(
+              *entails.map(&:pname))}
+          specify {
+            expect {|b| prop.entail(:subProperty, &b)
+            }.to yield_control.at_least(entails.length)}
+        end
+
+        # XXX all of these can probably be rolled up too
+
+        stmt = RDF::Statement(RDF::URI('a'), prop, RDF::Literal(true))
+
+        describe RDF::Statement do
+          subject {stmt}
+          let(:results) {entails.map {|r|
+              RDF::Statement(RDF::URI("a"), r, RDF::Literal(true))}}
+          specify {expect(subject.entail(:subProperty)).to be_empty}
+          specify {expect(subject.entail(:subProperty)).to all(be_inferred)}
+          specify {expect {|b|
+              subject.entail(:subProperty, &b)}.not_to yield_control}
+        end
+
+        describe RDF::Enumerable do
+          subject {[stmt].extend(RDF::Enumerable)}
+          specify {
+            expect(subject.entail(:subProperty)).to be_a(RDF::Enumerable)}
+          specify {expect(subject.entail(:subProperty).to_a).to be_empty}
+          specify {
+            expect {|b| subject.entail(:subProperty, &b)}.not_to yield_control}
+        end
+
+        describe RDF::Mutable do
+          subject {RDF::Graph.new << stmt}
+          let(:results) {subject.dup}
+          specify {expect(subject.entail(:subProperty)).to be_a(RDF::Graph)}
+          specify {expect(
+            subject.entail(:subProperty)).to be_equivalent_graph(results)}
+          specify {expect(subject.entail!(:subProperty)).to equal subject}
+        end
+      end
+    end
+  end unless ENV['CI']
+  
   describe :domain do
     {
       RDF::Vocab::FOAF.account => [RDF::Vocab::FOAF.Agent],
