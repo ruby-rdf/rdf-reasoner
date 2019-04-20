@@ -8,6 +8,7 @@ Reasons over RDFS/OWL vocabularies and schema.org to generate statements which a
 * Entail `rdfs:subPropertyOf` generating an array of terms which are ancestors of the subject.
 * Entail `rdfs:domain` and `rdfs:range` adding `rdf:type` assertions on the subject or object.
 * Inverse `rdfs:subClassOf` entailment, to find descendant classes of the subject term.
+* Inverse `rdfs:subPropertyOf` entailment, to find descendant properties of the subject term.
 * Entail `owl:equivalentClass` generating an array of terms equivalent to the subject.
 * Entail `owl:equivalentProperty` generating an array of terms equivalent to the subject.
 * `domainCompatible?` determines if a particular resource is compatible with the domain definition of a given predicate, based on the intersection of entailed subclasses with the property domain.
