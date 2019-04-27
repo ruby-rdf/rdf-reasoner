@@ -6,7 +6,7 @@ require 'json/ld'
 # For now, override RDF::Utils::File.open_file to look for the file locally before attempting to retrieve it
 module RDF::Util
   module File
-    REMOTE_PATH = "http://www.w3.org/2013/rdf-mt-tests/"
+    REMOTE_PATH = "https://www.w3.org/2013/rdf-mt-tests/"
     LOCAL_PATH = ::File.expand_path("../w3c-rdf/rdf-mt", __FILE__) + '/'
 
     class << self

@@ -7,7 +7,7 @@ module RDF
   # RDFS/OWL reasonsing for RDF.rb.
   #
   # @see http://www.w3.org/TR/2013/REC-sparql11-entailment-20130321/
-  # @author [Gregg Kellogg](http://greggkellogg.net/)
+  # @author [Gregg Kellogg](https://greggkellogg.net/)
   module Reasoner
     require 'rdf/reasoner/format'
     autoload :OWL,     'rdf/reasoner/owl'

@@ -5,7 +5,7 @@ module RDF::Reasoner
   # @example Obtaining an LD Patch format class
   #     RDF::Format.for(:reasoner)           #=> RDF::Reasoner::Format
   #
-  # @see http://www.w3.org/TR/ldpatch/
+  # @see https://www.w3.org/TR/ldpatch/
   class Format < RDF::Format
 
     ##

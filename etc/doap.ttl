@@ -7,9 +7,9 @@
 @prefix ex:   <http://example.org/> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
-<http://rubygems.org/gems/rdf-reasoner> a doap:Project, earl:TestSubject, earl:Software ;
+<https://rubygems.org/gems/rdf-reasoner> a doap:Project, earl:TestSubject, earl:Software ;
   doap:name          "RDF::Reasoner" ;
-  doap:homepage      <http://ruby-rdf.github.com/rdf-reasoner> ;
+  doap:homepage      <https://ruby-rdf.github.com/rdf-reasoner> ;
   doap:license       <http://creativecommons.org/licenses/publicdomain/> ;
   doap:shortdesc     "RDFS/OWL/Schema.org Reasoner for RDF.rb."@en ;
   doap:description   """
@@ -25,14 +25,14 @@
                      <http://www.w3.org/TR/rdf-schema/> ;
   doap:category      <http://dbpedia.org/resource/Resource_Description_Framework>,
                      <http://dbpedia.org/resource/Ruby_(programming_language)> ;
-  doap:download-page <http://rubygems.org/gems/rdf-reasoner> ;
+  doap:download-page <https://rubygems.org/gems/rdf-reasoner> ;
   doap:mailing-list  <http://lists.w3.org/Archives/Public/public-rdf-ruby/> ;
-  doap:bug-database  <http://github.com/ruby-rdf/rdf-reasoner/issues> ;
-  doap:blog          <http://greggkellogg.net/> ;
-  doap:developer     <http://greggkellogg.net/foaf#me> ;
-  doap:maintainer    <http://greggkellogg.net/foaf#me> ;
-  doap:documenter    <http://greggkellogg.net/foaf#me> ;
-  foaf:maker         <http://greggkellogg.net/foaf#me> ;
+  doap:bug-database  <https://githubhub.com/ruby-rdf/rdf-reasoner/issues> ;
+  doap:blog          <https://greggkellogg.net/> ;
+  doap:developer     <https://greggkellogg.net/foaf#me> ;
+  doap:maintainer    <https://greggkellogg.net/foaf#me> ;
+  doap:documenter    <https://greggkellogg.net/foaf#me> ;
+  foaf:maker         <https://greggkellogg.net/foaf#me> ;
   dc:title           "RDF::Reasoner" ;
   dc:description     """
     Reasons over RDFS/OWL vocabularies to generate statements which are
@@ -42,8 +42,8 @@
     SPARQL Entailment Regimes.
   """@en ;
   dc:date            "2014-06-01"^^xsd:date ;
-  dc:creator         <http://greggkellogg.net/foaf#me> ;
-  dc:isPartOf        <http://rubygems.org/gems/rdf> .
+  dc:creator         <https://greggkellogg.net/foaf#me> ;
+  dc:isPartOf        <https://rubygems.org/gems/rdf> .
 
-<http://greggkellogg.net/foaf#me> a foaf:Person, foaf:Agent, dc:Agent;
+<https://greggkellogg.net/foaf#me> a foaf:Person, foaf:Agent, dc:Agent;
    foaf:name        "Gregg Kellogg".
