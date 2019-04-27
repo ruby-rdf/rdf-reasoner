@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.date               = File.mtime('VERSION').strftime('%Y-%m-%d')
 
   gem.name               = "rdf-reasoner"
-  gem.homepage           = "http://github.com/gkellogg/rdf-reasoner"
+  gem.homepage           = "https://githubhub.com/gkellogg/rdf-reasoner"
   gem.license            = 'Unlicense'
   gem.summary            = "RDFS/OWL Reasoner for RDF.rb"
 
@@ -16,7 +16,6 @@ Gem::Specification.new do |gem|
   gem.platform           = Gem::Platform::RUBY
   gem.files              = %w(AUTHORS README.md UNLICENSE VERSION) + Dir.glob('lib/**/*.rb')
   gem.require_paths      = %w(lib)
-  gem.has_rdoc           = false
   gem.description        = %(Reasons over RDFS/OWL vocabularies to generate statements
                              which are entailed based on base RDFS/OWL rules along with
                              vocabulary information. It can also be used to ask specific
@@ -32,10 +31,9 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'rdf-spec',        '~> 3.0'
   gem.add_development_dependency 'rdf-turtle',      '~> 3.0'
-  #gem.add_development_dependency 'json-ld',         '~> 3.0'
-  gem.add_development_dependency 'json-ld',         '>= 2.2', '< 4.0'
+  gem.add_development_dependency 'json-ld',         '~> 3.0'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
-  gem.add_development_dependency 'rspec',           '~> 3.7'
-  gem.add_development_dependency 'yard' ,           '~> 0.9.12'
+  gem.add_development_dependency 'rspec',           '~> 3.8'
+  gem.add_development_dependency 'yard' ,           '~> 0.9.19'
   gem.post_install_message       = nil
 end

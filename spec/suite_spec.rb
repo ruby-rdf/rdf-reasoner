@@ -41,6 +41,8 @@ describe RDF::Reasoner do
                   case result_graph
                   when RDF::Enumerable
                     # Add source triples to result to use equivalence
+                    # FIXME: entailment test should be subgraph, considering BNode equivalence.
+                    # Could be implemented in N3 as {G2 . {G1} => log:Success} or {G2} log:includes {G1}
                     action_graph.each {|s| result_graph << s}
                     expect(action_graph).to be_equivalent_graph(result_graph, t)
                   when false

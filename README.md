@@ -8,6 +8,7 @@ Reasons over RDFS/OWL vocabularies and schema.org to generate statements which a
 * Entail `rdfs:subPropertyOf` generating an array of terms which are ancestors of the subject.
 * Entail `rdfs:domain` and `rdfs:range` adding `rdf:type` assertions on the subject or object.
 * Inverse `rdfs:subClassOf` entailment, to find descendant classes of the subject term.
+* Inverse `rdfs:subPropertyOf` entailment, to find descendant properties of the subject term.
 * Entail `owl:equivalentClass` generating an array of terms equivalent to the subject.
 * Entail `owl:equivalentProperty` generating an array of terms equivalent to the subject.
 * `domainCompatible?` determines if a particular resource is compatible with the domain definition of a given predicate, based on the intersection of entailed subclasses with the property domain.
@@ -51,7 +52,7 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
 
     RDF::Reasoner.apply(:rdfs)
     graph = RDF::Graph.load("etc/doap.ttl")
-    subj = RDF::URI("http://rubygems.org/gems/rdf-reasoner")
+    subj = RDF::URI("https://rubygems.org/gems/rdf-reasoner")
     RDF::Vocab::DOAP.name.domain_compatible?(subj, graph) # => true
 
 ### Determine if a resource is compatible with the ranges of a property
@@ -103,16 +104,16 @@ The `rdf` command-line interface is extended with `entail` and `lint` commands. 
 
 ## Dependencies
 
-* [Ruby](http://ruby-lang.org/) (>= 2.2.2)
-* [RDF.rb](http://rubygems.org/gems/rdf) (~> 3.0)
+* [Ruby](https://ruby-lang.org/) (>= 2.2.2)
+* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.0)
 
 ## Mailing List
 
-* <http://lists.w3.org/Archives/Public/public-rdf-ruby/>
+* <https://lists.w3.org/Archives/Public/public-rdf-ruby/>
 
 ## Authors
 
-* [Gregg Kellogg](http://github.com/gkellogg) - <http://greggkellogg.net/>
+* [Gregg Kellogg](https://githubhub.com/gkellogg) - <https://greggkellogg.net/>
 
 ## Contributing
 
@@ -132,17 +133,17 @@ The `rdf` command-line interface is extended with `entail` and `lint` commands. 
 ## License
 
 This is free and unencumbered public domain software. For more information,
-see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
+see <https://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 
-[Ruby]:             http://ruby-lang.org/
-[RDF]:              http://www.w3.org/RDF/
-[YARD]:             http://yardoc.org/
-[YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
-[PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
-[SPARQL]:           http://en.wikipedia.org/wiki/SPARQL
-[SPARQL Query]:     http://www.w3.org/TR/2013/REC-sparql11-query-20130321/
-[SPARQL Entailment]:http://www.w3.org/TR/sparql11-entailment/
-[RDF 1.1]:          http://www.w3.org/TR/rdf11-concepts
-[RDF.rb]:           http://www.rubydoc.info/github/ruby-rdf/rdf/
-[RDF Schema]:       http://www.w3.org/TR/rdf-schema/
+[Ruby]:             https://ruby-lang.org/
+[RDF]:              https://www.w3.org/RDF/
+[YARD]:             https://yardoc.org/
+[YARD-GS]:          https://rubydoc.info/docs/yard/file/docs/GettingStarted.md
+[PDD]:              https://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
+[SPARQL]:           https://en.wikipedia.org/wiki/SPARQL
+[SPARQL Query]:     https://www.w3.org/TR/2013/REC-sparql11-query-20130321/
+[SPARQL Entailment]:https://www.w3.org/TR/sparql11-entailment/
+[RDF 1.1]:          https://www.w3.org/TR/rdf11-concepts
+[RDF.rb]:           https://www.rubydoc.info/github/ruby-rdf/rdf/
+[RDF Schema]:       https://www.w3.org/TR/rdf-schema/
 [Rack]:             https://rack.github.io/

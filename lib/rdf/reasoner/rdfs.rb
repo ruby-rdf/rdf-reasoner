@@ -35,6 +35,20 @@ module RDF::Reasoner
     end
 
     ##
+    # @return [RDF::Util::Cache]
+    # @private
+    def subProperty_cache
+      @@subProperty_cache ||= RDF::Util::Cache.new(-1)
+    end
+
+    ##
+    # @return [RDF::Util::Cache]
+    # @private
+    def descendant_property_cache
+      @@descendant_property_cache ||= RDF::Util::Cache.new(-1)
+    end
+
+    ##
     # For a Term: yield or return inferred subClassOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
     # For a Statement: if predicate is `rdf:types`, yield or return inferred statements having a subClassOf relationship to the type of this statement
     # @todo Should be able to entail owl:Restriction, which is a BNode. This should be allowed, and also add BNode values of that node, recursively, similar to SPARQL concise_bounded_description.uu
@@ -137,6 +151,50 @@ module RDF::Reasoner
         statements
       else []
       end
+    end
+
+    ##
+    # For a Term: yield or return inferred subProperty relationships
+    # by recursively applying to named subproperties to get a complete
+    # set of properties in the descendant chain of this property
+    #
+    # For a Statement: this is a no-op, as it's not useful in this context
+    # @private
+
+    def _entail_subProperty
+      case self
+      when RDF::URI, RDF::Node
+        unless property?
+          yield self if block_given?
+          return Array(self)
+        end
+
+        terms = descendant_property_cache[self] ||= (
+          Array(self.subProperty).map do |c|
+            c._entail_subProperty rescue c
+          end.flatten + Array(self)).compact
+
+        terms.each {|t| yield t } if block_given?
+        terms
+      else []
+      end
+    end
+
+    ##
+    # Get the immediate subproperties of this property.
+    #
+    # This iterates over terms defined in the vocabulary of this term,
+    # as well as the vocabularies imported by this vocabulary.
+    # @return [Array<RDF::Vocabulary::Term>]
+    def subProperty
+      raise RDF::Reasoner::Error,
+        "#{self} Can't entail subProperty" unless property?
+      vocabs = [self.vocab] + self.vocab.imported_from
+      subProperty_cache[self] ||= vocabs.map do |v|
+        Array(v.properties).select do |p|
+          p.property? && Array(p.subPropertyOf).include?(self)
+        end
+      end.flatten.compact
     end
 
     ##
@@ -303,6 +361,7 @@ module RDF::Reasoner
       mod.add_entailment :subClassOf, :_entail_subClassOf
       mod.add_entailment :subClass, :_entail_subClass
       mod.add_entailment :subPropertyOf, :_entail_subPropertyOf
+      mod.add_entailment :subProperty, :_entail_subProperty
       mod.add_entailment :domain, :_entail_domain
       mod.add_entailment :range, :_entail_range
     end

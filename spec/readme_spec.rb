@@ -25,7 +25,7 @@ describe RDF::Reasoner do
     it "Determine if a resource is compatible with the domains of a property" do
       RDF::Reasoner.apply(:rdfs)
       graph = RDF::Graph.load("etc/doap.ttl")
-      subj = RDF::URI("http://rubygems.org/gems/rdf-reasoner")
+      subj = RDF::URI("https://rubygems.org/gems/rdf-reasoner")
       expect(RDF::Vocab::DOAP.name).to be_domain_compatible(subj, graph)
     end
 
@@ -40,7 +40,7 @@ describe RDF::Reasoner do
       RDF::Reasoner.apply(:owl)
       graph = RDF::Graph.load("etc/doap.ttl")
       graph.entail!(:equivalentClass)
-      expect(graph).to have_statement(RDF::Statement(RDF::URI("http://greggkellogg.net/foaf#me"), RDF.type, RDF::Vocab::DC.Agent))
+      expect(graph).to have_statement(RDF::Statement(RDF::URI("https://greggkellogg.net/foaf#me"), RDF.type, RDF::Vocab::DC.Agent))
     end
 
     it "Yield all entailed statements for all entailment methods" do
