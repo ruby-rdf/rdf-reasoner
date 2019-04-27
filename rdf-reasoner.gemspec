@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.date               = File.mtime('VERSION').strftime('%Y-%m-%d')
 
   gem.name               = "rdf-reasoner"
-  gem.homepage           = "http://github.com/gkellogg/rdf-reasoner"
+  gem.homepage           = "https://githubhub.com/gkellogg/rdf-reasoner"
   gem.license            = 'Unlicense'
   gem.summary            = "RDFS/OWL Reasoner for RDF.rb"
 
@@ -31,10 +31,9 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'rdf-spec',        '~> 3.0'
   gem.add_development_dependency 'rdf-turtle',      '~> 3.0'
-  #gem.add_development_dependency 'json-ld',         '~> 3.0'
-  gem.add_development_dependency 'json-ld',         '>= 2.2', '< 4.0'
+  gem.add_development_dependency 'json-ld',         '~> 3.0'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
-  gem.add_development_dependency 'rspec',           '~> 3.7'
-  gem.add_development_dependency 'yard' ,           '~> 0.9.12'
+  gem.add_development_dependency 'rspec',           '~> 3.8'
+  gem.add_development_dependency 'yard' ,           '~> 0.9.19'
   gem.post_install_message       = nil
 end
