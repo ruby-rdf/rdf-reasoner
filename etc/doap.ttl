@@ -27,7 +27,7 @@
                      <http://dbpedia.org/resource/Ruby_(programming_language)> ;
   doap:download-page <https://rubygems.org/gems/rdf-reasoner> ;
   doap:mailing-list  <http://lists.w3.org/Archives/Public/public-rdf-ruby/> ;
-  doap:bug-database  <https://githubhub.com/ruby-rdf/rdf-reasoner/issues> ;
+  doap:bug-database  <https://github.com/ruby-rdf/rdf-reasoner/issues> ;
   doap:blog          <https://greggkellogg.net/> ;
   doap:developer     <https://greggkellogg.net/foaf#me> ;
   doap:maintainer    <https://greggkellogg.net/foaf#me> ;
