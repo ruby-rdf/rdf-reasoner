@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.date               = File.mtime('VERSION').strftime('%Y-%m-%d')
 
   gem.name               = "rdf-reasoner"
-  gem.homepage           = "https://githubhub.com/gkellogg/rdf-reasoner"
+  gem.homepage           = "https://github.com/ruby-rdf/rdf-reasoner"
   gem.license            = 'Unlicense'
   gem.summary            = "RDFS/OWL Reasoner for RDF.rb"
 

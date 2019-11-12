@@ -113,7 +113,7 @@ The `rdf` command-line interface is extended with `entail` and `lint` commands. 
 
 ## Authors
 
-* [Gregg Kellogg](https://githubhub.com/gkellogg) - <https://greggkellogg.net/>
+* [Gregg Kellogg](https://github.com/gkellogg) - <https://greggkellogg.net/>
 
 ## Contributing
 
