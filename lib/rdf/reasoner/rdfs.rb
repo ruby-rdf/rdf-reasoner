@@ -74,7 +74,7 @@ module RDF::Reasoner
           if term = (RDF::Vocabulary.find_term(self.object) rescue nil)
             term._entail_subClassOf do |t|
               next if t.node? # Don't entail BNodes
-              statements << RDF::Statement(self.to_h.merge(object: t, inferred: true))
+              statements << RDF::Statement(**self.to_h.merge(object: t, inferred: true))
             end
           end
           #$stderr.puts("subClassf(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
@@ -143,7 +143,7 @@ module RDF::Reasoner
         statements = []
         if term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term._entail_subPropertyOf do |t|
-            statements << RDF::Statement(self.to_h.merge(predicate: t, inferred: true))
+            statements << RDF::Statement(**self.to_h.merge(predicate: t, inferred: true))
           end
           #$stderr.puts("subPropertyOf(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
         end
@@ -208,7 +208,7 @@ module RDF::Reasoner
         if term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term.domain.each do |t|
             next if t.node? # Don't entail BNodes
-            statements << RDF::Statement(self.to_h.merge(predicate: RDF.type, object: t, inferred: true))
+            statements << RDF::Statement(**self.to_h.merge(predicate: RDF.type, object: t, inferred: true))
           end
         end
         #$stderr.puts("domain(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}}")
@@ -229,7 +229,7 @@ module RDF::Reasoner
         if object.resource? && term = (RDF::Vocabulary.find_term(self.predicate) rescue nil)
           term.range.each do |t|
             next if t.node? # Don't entail BNodes
-            statements << RDF::Statement(self.to_h.merge(subject: self.object, predicate: RDF.type, object: t, inferred: true))
+            statements << RDF::Statement(**self.to_h.merge(subject: self.object, predicate: RDF.type, object: t, inferred: true))
           end
         end
         #$stderr.puts("range(#{self.predicate.pname}): #{statements.map(&:object).map {|r| r.respond_to?(:pname) ? r.pname : r.to_ntriples}}")
@@ -249,13 +249,13 @@ module RDF::Reasoner
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def domain_compatible_rdfs?(resource, queryable, options = {})
+    def domain_compatible_rdfs?(resource, queryable, **options)
       raise RDF::Reasoner::Error, "#{self} can't get domains" unless property?
       domains = Array(self.domain).reject(&:node?) - [RDF::OWL.Thing, RDF::RDFS.Resource]
 
       # Fully entailed types of the resource
       types = options.fetch(:types) do
-        queryable.query(subject: resource, predicate: RDF.type).
+        queryable.query({subject: resource, predicate: RDF.type}).
           map {|s| (t = (RDF::Vocabulary.find_term(s.object)) rescue nil) && t.entail(:subClassOf)}.
           flatten.
           uniq.
@@ -276,7 +276,7 @@ module RDF::Reasoner
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def range_compatible_rdfs?(resource, queryable, options = {})
+    def range_compatible_rdfs?(resource, queryable, **options)
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
       if !(ranges = Array(self.range).reject(&:node?) - [RDF::OWL.Thing, RDF::RDFS.Resource]).empty?
         if resource.literal?
@@ -337,7 +337,7 @@ module RDF::Reasoner
         else
           # Fully entailed types of the resource
           types = options.fetch(:types) do
-            queryable.query(subject: resource, predicate: RDF.type).
+            queryable.query({subject: resource, predicate: RDF.type}).
               map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
               flatten.
               uniq.

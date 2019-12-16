@@ -11,7 +11,7 @@ end
 
 require 'getoptlong'
 
-def run(reader, options)
+def run(reader, **options)
   repo = RDF::Repository.new << reader
   stmt_cnt = repo.count
   prefixes = reader.prefixes
@@ -96,13 +96,13 @@ end
 
 if ARGV.empty?
   s = input ? input : $stdin.read
-  RDF::Reader.for(options[:input_format] || :ntriples).new(input, options) do |reader|
-    run(reader, options)
+  RDF::Reader.for(options[:input_format] || :ntriples).new(input, **options) do |reader|
+    run(reader, **options)
   end
 else
   ARGV.each do |file|
     RDF::Reader.open(file, parser_options) do |reader|
-      run(reader, options)
+      run(reader, **options)
     end
   end
 end
