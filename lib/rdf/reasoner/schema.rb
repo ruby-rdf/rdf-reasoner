@@ -22,12 +22,12 @@ module RDF::Reasoner
     # @param [Hash{Symbol => Object}] options
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def domain_compatible_schema?(resource, queryable, options = {})
+    def domain_compatible_schema?(resource, queryable, **options)
       raise RDF::Reasoner::Error, "#{self} can't get domains" unless property?
       domains = Array(self.domainIncludes) - [RDF::OWL.Thing]
 
       # Fully entailed types of the resource
-      types = entailed_types(resource, queryable, options) unless domains.empty?
+      types = entailed_types(resource, queryable, **options) unless domains.empty?
 
       # Every domain must match some entailed type
       resource_acceptable = Array(types).empty? || domains.any? {|d| types.include?(d)}
@@ -35,7 +35,7 @@ module RDF::Reasoner
       # Resource may still be acceptable if types include schema:Role, and any any other resource references `resource` using this property
       resource_acceptable ||
         types.include?(RDF::Vocab::SCHEMA.Role) &&
-          !queryable.query(predicate: self, object: resource).empty?
+          !queryable.query({predicate: self, object: resource}).empty?
     end
 
     ##
@@ -52,7 +52,7 @@ module RDF::Reasoner
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def range_compatible_schema?(resource, queryable, options = {})
+    def range_compatible_schema?(resource, queryable, **options)
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
       if !(ranges = Array(self.rangeIncludes) - [RDF::OWL.Thing]).empty?
         if resource.literal?
@@ -123,12 +123,12 @@ module RDF::Reasoner
           true # schema:URL matches URI resources
         elsif ranges == [RDF::Vocab::SCHEMA.Text] && resource.uri?
           # Allowed if resource is untyped
-          entailed_types(resource, queryable, options).empty?
+          entailed_types(resource, queryable, **options).empty?
         elsif literal_range?(ranges)
           false # If resource isn't literal, this is a range violation
         else
           # Fully entailed types of the resource
-          types = entailed_types(resource, queryable, options)
+          types = entailed_types(resource, queryable, **options)
 
           # Every range must match some entailed type
           resource_acceptable = Array(types).empty? || ranges.any? {|d| types.include?(d)}
@@ -138,7 +138,7 @@ module RDF::Reasoner
 
           # Resource also acceptable if it is a Role, and the Role object contains the same predicate having a compatible object
           types.include?(RDF::Vocab::SCHEMA.Role) &&
-            queryable.query(subject: resource, predicate: self).any? do |stmt|
+            queryable.query({subject: resource, predicate: self}).any? do |stmt|
               acc = self.range_compatible_schema?(stmt.object, queryable)
               acc
             end ||
@@ -174,9 +174,9 @@ module RDF::Reasoner
 
     private
     # Fully entailed types
-    def entailed_types(resource, queryable, options = {})
+    def entailed_types(resource, queryable, **options)
       options.fetch(:types) do
-        queryable.query(subject: resource, predicate: RDF.type).
+        queryable.query({subject: resource, predicate: RDF.type}).
           map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
           flatten.
           uniq.

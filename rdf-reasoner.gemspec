@@ -23,17 +23,17 @@ Gem::Specification.new do |gem|
                              the vocabulary ruleset. This can be used to implement
                              SPARQL Entailment Regimes.).gsub(/\s+/m, ' ')
 
-  gem.required_ruby_version      = '>= 2.2.2'
+  gem.required_ruby_version      = '>= 2.4'
   gem.requirements               = []
-  gem.add_runtime_dependency     'rdf',             '~> 3.0'
-  gem.add_runtime_dependency     'rdf-vocab',       '~> 3.0'
-  gem.add_runtime_dependency     'rdf-xsd',         '~> 3.0'
+  gem.add_runtime_dependency     'rdf',             '~> 3.1'
+  gem.add_runtime_dependency     'rdf-vocab',       '~> 3.1'
+  gem.add_runtime_dependency     'rdf-xsd',         '~> 3.1'
 
-  gem.add_development_dependency 'rdf-spec',        '~> 3.0'
-  gem.add_development_dependency 'rdf-turtle',      '~> 3.0'
-  gem.add_development_dependency 'json-ld',         '~> 3.0'
+  gem.add_development_dependency 'rdf-spec',        '~> 3.1'
+  gem.add_development_dependency 'rdf-turtle',      '~> 3.1'
+  gem.add_development_dependency 'json-ld',         '~> 3.1'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
-  gem.add_development_dependency 'rspec',           '~> 3.8'
-  gem.add_development_dependency 'yard' ,           '~> 0.9.19'
+  gem.add_development_dependency 'rspec',           '~> 3.9'
+  gem.add_development_dependency 'yard' ,           '~> 0.9.20'
   gem.post_install_message       = nil
 end

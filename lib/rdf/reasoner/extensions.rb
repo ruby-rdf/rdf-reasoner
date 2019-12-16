@@ -34,9 +34,9 @@ module RDF
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def domain_compatible?(resource, queryable, options = {})
+    def domain_compatible?(resource, queryable, **options)
       %w(owl rdfs schema).map {|r| "domain_compatible_#{r}?".to_sym}.all? do |meth|
-        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, **options)
       end
     end
 
@@ -50,9 +50,9 @@ module RDF
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def range_compatible?(resource, queryable, options = {})
+    def range_compatible?(resource, queryable, **options)
       %w(owl rdfs schema).map {|r| "range_compatible_#{r}?".to_sym}.all? do |meth|
-        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, **options)
       end
     end
   end
@@ -89,9 +89,9 @@ module RDF
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def domain_compatible?(resource, queryable, options = {})
+    def domain_compatible?(resource, queryable, **options)
       %w(owl rdfs schema).map {|r| "domain_compatible_#{r}?".to_sym}.all? do |meth|
-        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, **options)
       end
     end
 
@@ -105,9 +105,9 @@ module RDF
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def range_compatible?(resource, queryable, options = {})
+    def range_compatible?(resource, queryable, **options)
       %w(owl rdfs schema).map {|r| "range_compatible_#{r}?".to_sym}.all? do |meth|
-        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, **options)
       end
     end
   end
@@ -233,7 +233,7 @@ module RDF
       messages = {}
 
       # Check for defined classes in known vocabularies
-      self.query(predicate: RDF.type) do |stmt|
+      self.query({predicate: RDF.type}) do |stmt|
         vocab = RDF::Vocabulary.find(stmt.object)
         term = (RDF::Vocabulary.find_term(stmt.object) rescue nil) if vocab
         pname = term ? term.pname : stmt.object.pname
@@ -275,7 +275,7 @@ module RDF
         end
 
         # See if type of the subject is in the domain of this predicate
-        resource_types[stmt.subject] ||= self.query(subject: stmt.subject, predicate: RDF.type).
+        resource_types[stmt.subject] ||= self.query({subject: stmt.subject, predicate: RDF.type}).
         map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
           flatten.
           uniq.
@@ -290,7 +290,7 @@ module RDF
         end
 
         # Make sure that if ranges are defined, the object has an appropriate type
-        resource_types[stmt.object] ||= self.query(subject: stmt.object, predicate: RDF.type).
+        resource_types[stmt.object] ||= self.query({subject: stmt.object, predicate: RDF.type}).
           map {|s| (t = (RDF::Vocabulary.find_term(s.object) rescue nil)) && t.entail(:subClassOf)}.
           flatten.
           uniq.
@@ -316,7 +316,7 @@ module RDF
     def show_resource(resource)
       if resource.node?
         resource.to_ntriples + '(' +
-          self.query(subject: resource, predicate: RDF.type).
+          self.query({subject: resource, predicate: RDF.type}).
             map {|s| s.object.uri? ? s.object.pname : s.object.to_ntriples}
             .join(',') +
           ')'

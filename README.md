@@ -104,8 +104,8 @@ The `rdf` command-line interface is extended with `entail` and `lint` commands. 
 
 ## Dependencies
 
-* [Ruby](https://ruby-lang.org/) (>= 2.2.2)
-* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.0)
+* [Ruby](https://ruby-lang.org/) (>= 2.4)
+* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.1)
 
 ## Mailing List
 
