@@ -34,9 +34,9 @@ module RDF
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def domain_compatible?(resource, queryable, **options)
+    def domain_compatible?(resource, queryable, options = {})
       %w(owl rdfs schema).map {|r| "domain_compatible_#{r}?".to_sym}.all? do |meth|
-        !self.respond_to?(meth) || self.send(meth, resource, queryable, **options)
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
       end
     end
 
@@ -50,9 +50,9 @@ module RDF
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def range_compatible?(resource, queryable, **options)
+    def range_compatible?(resource, queryable, options = {})
       %w(owl rdfs schema).map {|r| "range_compatible_#{r}?".to_sym}.all? do |meth|
-        !self.respond_to?(meth) || self.send(meth, resource, queryable, **options)
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
       end
     end
   end
@@ -89,7 +89,7 @@ module RDF
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def domain_compatible?(resource, queryable, **options)
+    def domain_compatible?(resource, queryable, options = {})
       %w(owl rdfs schema).map {|r| "domain_compatible_#{r}?".to_sym}.all? do |meth|
         !self.respond_to?(meth) || self.send(meth, resource, queryable, **options)
       end
@@ -105,9 +105,9 @@ module RDF
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def range_compatible?(resource, queryable, **options)
+    def range_compatible?(resource, queryable, options = {})
       %w(owl rdfs schema).map {|r| "range_compatible_#{r}?".to_sym}.all? do |meth|
-        !self.respond_to?(meth) || self.send(meth, resource, queryable, **options)
+        !self.respond_to?(meth) || self.send(meth, resource, queryable, options)
       end
     end
   end

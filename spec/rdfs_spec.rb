@@ -100,7 +100,6 @@ describe RDF::Reasoner::RDFS do
       RDF::Vocab::FOAF.aimChatID => [RDF::Vocab::FOAF.aimChatID, RDF::Vocab::FOAF.nick],
       RDF::Vocab::FOAF.name => [RDF::Vocab::FOAF.name, RDF::RDFS.label],
       RDF::Vocab::CC.license => [RDF::Vocab::CC.license, RDF::Vocab::DC.license],
-      RDF::Vocab::DC.date => [RDF::Vocab::DC.date, RDF::Vocab::DC11.date],
     }.each do |prop, entails|
       context prop.pname do
         describe RDF::Vocabulary::Term do
@@ -140,10 +139,7 @@ describe RDF::Reasoner::RDFS do
   # XXX this is cribbed from :subClass
   describe :subProperty do
     {
-      RDF::Vocab::DC.relation => %w(conformsTo hasFormat hasPart hasVersion
-        isFormatOf isPartOf isReferencedBy isReplacedBy isRequiredBy
-        isVersionOf references relation replaces requires source).map {
-        |t| RDF::Vocab::DC[t] } + %w(derived_from djmix_of mashup_of medley_of
+      RDF::Vocab::DC.source => %w(derived_from djmix_of mashup_of medley_of
       remaster_of remix_of sampled_version_of).map {|t| RDF::Vocab::MO[t] },
       RDF::Vocab::SIOC.space_of => %w(host_of).map {|t| RDF::Vocab::SIOC[t] },
     }.each do |prop, entails|
