@@ -22,6 +22,14 @@ Domain and Range entailment include specific rules for schema.org vocabularies.
 * If `resource` is of type `schema:Role`, it is range acceptable if it has the same property with an acceptable value.
 * If `resource` is of type `rdf:List` (must be previously entailed), it is range acceptable if all members of the list are otherwise range acceptable on the same property.
 
+### Limiting vocabularies used for reasoning
+
+As loading vocabularies can dominate processing time, the `RDF::Vocabulary.limit_vocabs` method can be used to set a specific set of vocabularies over which to reason. For example:
+
+    RDF::Vocabulary.limit_vocabs(:rdf, :rdf, :schema)
+
+will limit the vocabularies which are returned from `RDF::Vocabulary.each`, which is used for reasoning and other operations over vocabularies and terms.
+    
 ## Examples
 ### Determine super-classes of a class
 
