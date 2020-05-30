@@ -81,6 +81,7 @@ def extract_vocab(graph, ndx)
   if vocab_stmt
     vocab_subject = vocab_stmt.subject
     base = if vocab_subject.fragment
+      vocab_subject = vocab_subject.dup
       vocab_subject.fragment = ""
       vocab_subject
     else

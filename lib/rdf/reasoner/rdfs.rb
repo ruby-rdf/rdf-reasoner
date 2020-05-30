@@ -122,7 +122,7 @@ module RDF::Reasoner
 
     ##
     # For a Term: yield or return inferred subPropertyOf relationships by recursively applying to named super classes to get a complete set of classes in the ancestor chain of this class
-    # For a Statement: yield or return inferred statements having a subPropertyOf relationship to predicate of this statement
+    # For a Statement: yield or return inferred statements having a subPropertyOf relationship to predicate of this statements
     # @private
     def _entail_subPropertyOf
       case self
@@ -249,7 +249,7 @@ module RDF::Reasoner
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def domain_compatible_rdfs?(resource, queryable, **options)
+    def domain_compatible_rdfs?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get domains" unless property?
       domains = Array(self.domain).reject(&:node?) - [RDF::OWL.Thing, RDF::RDFS.Resource]
 
@@ -276,7 +276,7 @@ module RDF::Reasoner
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def range_compatible_rdfs?(resource, queryable, **options)
+    def range_compatible_rdfs?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
       if !(ranges = Array(self.range).reject(&:node?) - [RDF::OWL.Thing, RDF::RDFS.Resource]).empty?
         if resource.literal?

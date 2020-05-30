@@ -6,7 +6,7 @@ module RDF
   ##
   # RDFS/OWL reasonsing for RDF.rb.
   #
-  # @see http://www.w3.org/TR/2013/REC-sparql11-entailment-20130321/
+  # @see https://www.w3.org/TR/2013/REC-sparql11-entailment-20130321/
   # @author [Gregg Kellogg](https://greggkellogg.net/)
   module Reasoner
     require 'rdf/reasoner/format'
@@ -15,7 +15,7 @@ module RDF
     autoload :Schema,  'rdf/reasoner/schema'
     autoload :VERSION, 'rdf/reasoner/version'
 
-    # See http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/
+    # See https://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/
     #
     # 
     ISO_8601 =  %r(^

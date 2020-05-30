@@ -2,7 +2,7 @@
 require 'rubygems'
 $:.unshift(File.expand_path("../../lib", __FILE__))
 require 'rdf/reasoner'
-%w(linkeddata rdf/turtle rdf/vocab).each do |req|
+%w(linkeddata rdf/turtle rdf/rdfa rdf/vocab).each do |req|
   begin
     require req
   rescue LoadError
@@ -10,11 +10,35 @@ require 'rdf/reasoner'
 end
 
 require 'getoptlong'
+require 'ruby-prof'
 
-def run(reader, **options)
-  repo = RDF::Repository.new << reader
+def run(reader, file_name:, **options)
+  if options[:profile]
+    repo = RDF::Repository.new << reader
+
+    output_dir = File.expand_path("../../doc/profiles/#{File.basename file_name, '.*'}", __FILE__)
+    FileUtils.mkdir_p(output_dir)
+    profile = RubyProf::Profile.new
+    #profile.exclude_methods!(Array, :each, :map)
+    profile.exclude_method!(Hamster::Hash, :each)
+    profile.exclude_method!(Hamster::Trie, :each)
+    #profile.exclude_method!(Kernel, :require)
+    profile.exclude_method!(Object, :run)
+    profile.exclude_common_methods!
+    profile.start
+    run(repo, file_name: file_name, **options.merge(profile: false))
+    result = profile.stop
+    
+    # Print a graph profile to text
+    printer = RubyProf::MultiPrinter.new(result)
+    printer.print(path: output_dir, profile: "profile")
+    puts "output saved in #{output_dir}"
+    return
+  end
+
+  repo = reader.is_a?(RDF::Queryable) ? reader : RDF::Repository.new << reader
   stmt_cnt = repo.count
-  prefixes = reader.prefixes
+  prefixes = reader.respond_to?(:prefixes) ? reader.prefixes : {}
   start = Time.new
   if options[:entail]
     repo.entail!
@@ -34,9 +58,13 @@ def run(reader, **options)
         messages.each {|m| options[:output].puts "  #{m}"}
       end
     end
+  elsif !options[:output_format]
+    # No output
+    secs = Time.new - start
+    STDERR.puts "\nReade #{repo.count} statements in #{secs} seconds" unless options[:quiet]
   else
     writer_options = options[:parser_options].merge(prefixes: prefixes, standard_prefixes: true)
-    RDF::Writer.for(options[:output_format] || :ttl).new(options[:output], writer_options) do |w|
+    RDF::Writer.for(options[:output_format]).new(options[:output], writer_options) do |w|
       w << repo
     end
   end
@@ -49,7 +77,7 @@ parser_options = {base: nil}
 options = {
   parser_options: parser_options,
   output:         STDOUT,
-  output_format:  :ttl,
+  output_format:  nil,
   input_format:   nil,
 }
 input = nil
@@ -59,10 +87,12 @@ OPT_ARGS = [
   ["--format",        GetoptLong::REQUIRED_ARGUMENT,"Specify output format when converting to RDF"],
   ["--input-format",  GetoptLong::REQUIRED_ARGUMENT,"Format of the input document, when converting from RDF."],
   ["--output", "-o",  GetoptLong::REQUIRED_ARGUMENT,"Output to the specified file path"],
+  ["--profile",       GetoptLong::NO_ARGUMENT,       "Run profiler with output to doc/profiles/"],
   ["--quiet",         GetoptLong::NO_ARGUMENT,      "Supress most output other than progress indicators"],
   ["--uri",           GetoptLong::REQUIRED_ARGUMENT,"URI to be used as the document base"],
   ["--validate",      GetoptLong::NO_ARGUMENT,      "Validate input graph with reasoner"],
-  ["--help", "-?",    GetoptLong::NO_ARGUMENT,      "This message"]
+  ['--vocabs',        GetoptLong::REQUIRED_ARGUMENT,"Comma-separated list of vocabulary identifiers over which to limit reasoning"],
+  ["--help", "-?",    GetoptLong::NO_ARGUMENT,      "This message"],
 ]
 def usage
   STDERR.puts %{Usage: #{$0} [options] file ...}
@@ -85,24 +115,28 @@ opts.each do |opt, arg|
   case opt
   when '--entail'       then options[:entail] = true
   when '--format'       then options[:output_format] = arg.to_sym
-  when '--input-format' then options[:input_format] = arg.to_sym
+  when '--input-format' then parser_options[:format] = arg.to_sym
   when '--output'       then options[:output] = File.open(arg, "w")
+  when '--profile'      then options[:profile] = true
   when '--quiet'        then options[:quiet] = true
   when '--uri'          then parser_options[:base] = arg
   when '--validate'     then options[:validate] = true
+  when '--vocabs'       then (options[:vocabs] ||= []).concat(arg.split(',').map(&:strip))
   when '--help'         then usage
   end
 end
 
+RDF::Vocabulary.limit_vocabs(*options[:vocabs]) if options[:vocabs]
+
 if ARGV.empty?
   s = input ? input : $stdin.read
-  RDF::Reader.for(options[:input_format] || :ntriples).new(input, **options) do |reader|
+  RDF::Reader.for(parser_options[:format] || :ntriples).new(input, file_name: 'stdin', **options) do |reader|
     run(reader, **options)
   end
 else
   ARGV.each do |file|
-    RDF::Reader.open(file, parser_options) do |reader|
-      run(reader, **options)
+    RDF::Reader.open(file, **parser_options) do |reader|
+      run(reader, file_name: file, **options)
     end
   end
 end

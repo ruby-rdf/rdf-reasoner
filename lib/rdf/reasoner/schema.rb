@@ -22,7 +22,7 @@ module RDF::Reasoner
     # @param [Hash{Symbol => Object}] options
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def domain_compatible_schema?(resource, queryable, **options)
+    def domain_compatible_schema?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get domains" unless property?
       domains = Array(self.domainIncludes) - [RDF::OWL.Thing]
 
@@ -52,7 +52,7 @@ module RDF::Reasoner
     # @param [Hash{Symbol => Object}] options ({})
     # @option options [Array<RDF::Vocabulary::Term>] :types
     #   Fully entailed types of resource, if not provided, they are queried
-    def range_compatible_schema?(resource, queryable, **options)
+    def range_compatible_schema?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
       if !(ranges = Array(self.rangeIncludes) - [RDF::OWL.Thing]).empty?
         if resource.literal?
