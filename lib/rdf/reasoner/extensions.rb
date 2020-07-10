@@ -264,7 +264,7 @@ module RDF
         end
 
         # Must be a defined property
-        if term && term.property?
+        if term.respond_to?(:property?) && term.property?
           # Warn against using a deprecated term
           superseded = term.attributes[:'schema:supersededBy']
           superseded = superseded.pname if superseded.respond_to?(:pname)
