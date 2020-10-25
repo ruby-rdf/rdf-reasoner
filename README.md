@@ -136,7 +136,9 @@ The `rdf` command-line interface is extended with `entail` and `lint` commands. 
   list in the the `README`. Alphabetical order applies.
 * Do note that in order for us to merge any non-trivial changes (as a rule
   of thumb, additions larger than about 15 lines of code), we need an
-  explicit [public domain dedication][PDD] on record from you.
+  explicit [public domain dedication][PDD] on record from you,
+  which you will be asked to agree to on the first commit to a repo within the organization.
+  Note that the agreement applies to all repos in the [Ruby RDF](https://github.com/ruby-rdf/) organization.
 
 ## License
 
@@ -147,7 +149,7 @@ see <https://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [RDF]:              https://www.w3.org/RDF/
 [YARD]:             https://yardoc.org/
 [YARD-GS]:          https://rubydoc.info/docs/yard/file/docs/GettingStarted.md
-[PDD]:              https://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
+[PDD]:              https://unlicense.org/#unlicensing-contributions
 [SPARQL]:           https://en.wikipedia.org/wiki/SPARQL
 [SPARQL Query]:     https://www.w3.org/TR/2013/REC-sparql11-query-20130321/
 [SPARQL Entailment]:https://www.w3.org/TR/sparql11-entailment/
