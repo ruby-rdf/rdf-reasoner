@@ -1,4 +1,13 @@
-# rdf-reasoner
+# RDF::Reasoner
+
+A partial RDFS/OWL/schema.org reasoner for [RDF.rb][].
+
+[![Gem Version](https://badge.fury.io/rb/rdf-reasoner.png)](https://badge.fury.io/rb/rdf-reasoner)
+[![Build Status](https://github.com/ruby-rdf/rdf-reasoner/workflows/CI/badge.svg?branch=develop)](https://github.com/ruby-rdf/rdf-reasoner/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/ruby-rdf/rdf-reasoner/badge.svg)](https://coveralls.io/github/ruby-rdf/rdf-reasoner)
+[![Gitter chat](https://badges.gitter.im/ruby-rdf/rdf.png)](https://gitter.im/ruby-rdf/rdf)
+
+## Description
 
 Reasons over RDFS/OWL vocabularies and schema.org to generate statements which are entailed based on base RDFS/OWL rules along with vocabulary information. It can also be used to ask specific questions, such as if a given object is consistent with the vocabulary ruleset. This can be used to implement [SPARQL Entailment][] Regimes and [RDF Schema][] entailment.
 

@@ -33,7 +33,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rdf-turtle',      '~> 3.1'
   gem.add_development_dependency 'json-ld',         '~> 3.1'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
-  gem.add_development_dependency 'rspec',           '~> 3.9'
-  gem.add_development_dependency 'yard' ,           '~> 0.9.20'
+  gem.add_development_dependency 'rspec',           '~> 3.10'
+  gem.add_development_dependency 'yard' ,           '~> 0.9'
   gem.post_install_message       = nil
 end
