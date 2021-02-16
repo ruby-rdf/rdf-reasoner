@@ -1,6 +1,5 @@
 require 'rdf'
 require 'rdf/reasoner/extensions'
-require 'rdf/vocab'
 
 module RDF
   ##

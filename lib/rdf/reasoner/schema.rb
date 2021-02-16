@@ -24,7 +24,9 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def domain_compatible_schema?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get domains" unless property?
-      domains = Array(self.domainIncludes) - [RDF::OWL.Thing]
+      domains = Array(self.domainIncludes) +
+                Array(self.properties[:'https://schema.org/domainIncludes']) -
+                [RDF::OWL.Thing]
 
       # Fully entailed types of the resource
       types = entailed_types(resource, queryable, **options) unless domains.empty?
@@ -34,8 +36,8 @@ module RDF::Reasoner
 
       # Resource may still be acceptable if types include schema:Role, and any any other resource references `resource` using this property
       resource_acceptable ||
-        types.include?(RDF::Vocab::SCHEMA.Role) &&
-          !queryable.query({predicate: self, object: resource}).empty?
+        (types.include?(RDF::URI("http://schema.org/Role")) || types.include?(RDF::URI("https://schema.org/Role"))) &&
+        !queryable.query({predicate: self, object: resource}).empty?
     end
 
     ##
@@ -54,16 +56,23 @@ module RDF::Reasoner
     #   Fully entailed types of resource, if not provided, they are queried
     def range_compatible_schema?(resource, queryable, options = {})
       raise RDF::Reasoner::Error, "#{self} can't get ranges" unless property?
-      if !(ranges = Array(self.rangeIncludes) - [RDF::OWL.Thing]).empty?
+      if !(ranges = Array(self.rangeIncludes) +
+                    Array(self.properties[:'https://schema.org/rangeIncludes']) -
+                    [RDF::OWL.Thing]).empty?
         if resource.literal?
           ranges.any? do |range|
             case range
             when RDF::RDFS.Literal  then true
-            when RDF::Vocab::SCHEMA.Text   then resource.plain? || resource.datatype == RDF::Vocab::SCHEMA.Text
-            when RDF::Vocab::SCHEMA.Boolean
-              [RDF::Vocab::SCHEMA.Boolean, RDF::XSD.boolean].include?(resource.datatype) ||
+            when RDF::URI("http://schema.org/Text"), RDF::URI("https://schema.org/Text")
+              resource.plain? || resource.datatype == RDF::URI("http://schema.org/Text")
+            when RDF::URI("http://schema.org/Boolean"), RDF::URI("https://schema.org/Boolean")
+              [
+                RDF::URI("http://schema.org/Boolean"),
+                RDF::URI("https://schema.org/Boolean"),
+                RDF::XSD.boolean
+              ].include?(resource.datatype) ||
               resource.plain? && RDF::Literal::Boolean.new(resource.value).valid?
-            when RDF::Vocab::SCHEMA.Date
+            when RDF::URI("http://schema.org/Date"), RDF::URI("https://schema.org/Date")
               # Schema.org date based on ISO 8601, mapped to appropriate XSD types for validation
               case resource
               when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime, RDF::Literal::Duration
@@ -71,35 +80,56 @@ module RDF::Reasoner
               else
                 ISO_8601.match(resource.value)
               end
-            when RDF::Vocab::SCHEMA.DateTime
-              resource.datatype == RDF::Vocab::SCHEMA.DateTime ||
+            when RDF::URI("http://schema.org/DateTime"), RDF::URI("https://schema.org/DateTime")
+              resource.datatype == RDF::URI("http://schema.org/DateTime") ||
+              resource.datatype == RDF::URI("https://schema.org/DateTime") ||
               resource.is_a?(RDF::Literal::DateTime) ||
               resource.plain? && RDF::Literal::DateTime.new(resource.value).valid?
-            when RDF::Vocab::SCHEMA.Duration
+            when RDF::URI("http://schema.org/Duration"), RDF::URI("https://schema.org/Duration")
               value = resource.value
               value = "P#{value}" unless value.start_with?("P")
-              resource.datatype == RDF::Vocab::SCHEMA.Duration ||
+              resource.datatype == RDF::URI("http://schema.org/Duration") ||
+              resource.datatype == RDF::URI("https://schema.org/Duration") ||
               resource.is_a?(RDF::Literal::Duration) ||
               resource.plain? && RDF::Literal::Duration.new(value).valid?
-            when RDF::Vocab::SCHEMA.Time
-              resource.datatype == RDF::Vocab::SCHEMA.Time ||
+            when RDF::URI("http://schema.org/Time"), RDF::URI("https://schema.org/Time")
+              resource.datatype == RDF::URI("http://schema.org/Time") ||
+              resource.datatype == RDF::URI("https://schema.org/Time") ||
               resource.is_a?(RDF::Literal::Time) ||
               resource.plain? && RDF::Literal::Time.new(resource.value).valid?
-            when RDF::Vocab::SCHEMA.Number
+            when RDF::URI("http://schema.org/Number"), RDF::URI("https://schema.org/Number")
               resource.is_a?(RDF::Literal::Numeric) ||
-              [RDF::Vocab::SCHEMA.Number, RDF::Vocab::SCHEMA.Float, RDF::Vocab::SCHEMA.Integer].include?(resource.datatype) ||
+              [
+                RDF::URI("http://schema.org/Number"),
+                RDF::URI("http://schema.org/Float"),
+                RDF::URI("http://schema.org/Integer"),
+                RDF::URI("https://schema.org/Number"),
+                RDF::URI("https://schema.org/Float"),
+                RDF::URI("https://schema.org/Integer"),
+              ].include?(resource.datatype) ||
               resource.plain? && RDF::Literal::Integer.new(resource.value).valid? ||
               resource.plain? && RDF::Literal::Double.new(resource.value).valid?
-            when RDF::Vocab::SCHEMA.Float
+            when RDF::URI("http://schema.org/Float"), RDF::URI("https://schema.org/Float")
               resource.is_a?(RDF::Literal::Double) ||
-              [RDF::Vocab::SCHEMA.Number, RDF::Vocab::SCHEMA.Float].include?(resource.datatype) ||
+              [
+                RDF::URI("http://schema.org/Number"),
+                RDF::URI("http://schema.org/Float"),
+                RDF::URI("https://schema.org/Number"),
+                RDF::URI("https://schema.org/Float"),
+              ].include?(resource.datatype) ||
               resource.plain? && RDF::Literal::Double.new(resource.value).valid?
-            when RDF::Vocab::SCHEMA.Integer
+            when RDF::URI("http://schema.org/Integer"), RDF::URI("https://schema.org/Integer")
               resource.is_a?(RDF::Literal::Integer) ||
-              [RDF::Vocab::SCHEMA.Number, RDF::Vocab::SCHEMA.Integer].include?(resource.datatype) ||
+              [
+                RDF::URI("http://schema.org/Number"),
+                RDF::URI("http://schema.org/Integer"),
+                RDF::URI("https://schema.org/Number"),
+                RDF::URI("https://schema.org/Integer"),
+              ].include?(resource.datatype) ||
               resource.plain? && RDF::Literal::Integer.new(resource.value).valid?
-            when RDF::Vocab::SCHEMA.URL
-              resource.datatype == RDF::Vocab::SCHEMA.URL ||
+            when RDF::URI("http://schema.org/URL"), RDF::URI("https://schema.org/URL")
+              resource.datatype == RDF::URI("http://schema.org/URL") ||
+              resource.datatype == RDF::URI("https://schema.org/URL") ||
               resource.datatype == RDF::XSD.anyURI ||
               resource.plain? && RDF::Literal::AnyURI.new(resource.value).valid?
             else
@@ -117,11 +147,21 @@ module RDF::Reasoner
               end
             end
           end
-        elsif %w(True False).map {|v| RDF::Vocab::SCHEMA[v]}.include?(resource) && ranges.include?(RDF::Vocab::SCHEMA.Boolean)
+        elsif %w(
+            http://schema.org/True
+            http://schema.org/False
+            https://schema.org/True
+            https://schema.org/False
+          ).include?(resource) &&
+          (ranges.include?(RDF::URI("http://schema.org/Boolean")) || ranges.include?(RDF::URI("https://schema.org/Boolean")))
           true # Special case for schema boolean resources
-        elsif ranges.include?(RDF::Vocab::SCHEMA.URL) && resource.uri?
+        elsif (ranges.include?(RDF::URI("http://schema.org/URL")) || ranges.include?(RDF::URI("http://schema.org/URL"))) &&
+              resource.uri?
           true # schema:URL matches URI resources
-        elsif ranges == [RDF::Vocab::SCHEMA.Text] && resource.uri?
+        elsif ranges == [RDF::URI("http://schema.org/Text")] && resource.uri?
+          # Allowed if resource is untyped
+          entailed_types(resource, queryable, **options).empty?
+        elsif ranges == [RDF::URI("https://schema.org/Text")] && resource.uri?
           # Allowed if resource is untyped
           entailed_types(resource, queryable, **options).empty?
         elsif literal_range?(ranges)
@@ -137,7 +177,7 @@ module RDF::Reasoner
           resource_acceptable ||
 
           # Resource also acceptable if it is a Role, and the Role object contains the same predicate having a compatible object
-          types.include?(RDF::Vocab::SCHEMA.Role) &&
+          (types.include?(RDF::URI("http://schema.org/Role")) || types.include?(RDF::URI("https://schema.org/Role"))) &&
             queryable.query({subject: resource, predicate: self}).any? do |stmt|
               acc = self.range_compatible_schema?(stmt.object, queryable)
               acc
@@ -158,9 +198,25 @@ module RDF::Reasoner
     def literal_range?(ranges)
       ranges.all? do |range|
         case range
-        when RDF::RDFS.Literal, RDF::Vocab::SCHEMA.Text, RDF::Vocab::SCHEMA.Boolean, RDF::Vocab::SCHEMA.Date,
-             RDF::Vocab::SCHEMA.DateTime, RDF::Vocab::SCHEMA.Time, RDF::Vocab::SCHEMA.URL,
-             RDF::Vocab::SCHEMA.Number, RDF::Vocab::SCHEMA.Float, RDF::Vocab::SCHEMA.Integer
+        when RDF::RDFS.Literal,
+             RDF::URI("http://schema.org/Text"),
+             RDF::URI("http://schema.org/Boolean"),
+             RDF::URI("http://schema.org/Date"),
+             RDF::URI("http://schema.org/DateTime"),
+             RDF::URI("http://schema.org/Time"),
+             RDF::URI("http://schema.org/URL"),
+             RDF::URI("http://schema.org/Number"),
+             RDF::URI("http://schema.org/Float"),
+             RDF::URI("http://schema.org/Integer"),
+             RDF::URI("https://schema.org/Text"),
+             RDF::URI("https://schema.org/Boolean"),
+             RDF::URI("https://schema.org/Date"),
+             RDF::URI("https://schema.org/DateTime"),
+             RDF::URI("https://schema.org/Time"),
+             RDF::URI("https://schema.org/URL"),
+             RDF::URI("https://schema.org/Number"),
+             RDF::URI("https://schema.org/Float"),
+             RDF::URI("https://schema.org/Integer")
           true
         else
           # If this is an XSD range, look for appropriate literal

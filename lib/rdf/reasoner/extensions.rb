@@ -241,7 +241,7 @@ module RDF
         # Must be a defined term, not in RDF or RDFS vocabularies
         if term && term.class?
           # Warn against using a deprecated term
-          superseded = term.attributes[:'schema:supersededBy']
+          superseded = term.properties[:'http://schema.org/supersededBy']
           superseded = superseded.pname if superseded.respond_to?(:pname)
           (messages[:class] ||= {})[pname] = ["Term is superseded by #{superseded}"] if superseded
         else
@@ -266,7 +266,7 @@ module RDF
         # Must be a defined property
         if term.respond_to?(:property?) && term.property?
           # Warn against using a deprecated term
-          superseded = term.attributes[:'schema:supersededBy']
+          superseded = term.properties[:'http://schema.org/supersededBy']
           superseded = superseded.pname if superseded.respond_to?(:pname)
           (messages[:property] ||= {})[pname] = ["Term is superseded by #{superseded}"] if superseded
         else

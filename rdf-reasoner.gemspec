@@ -25,15 +25,15 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version      = '>= 2.4'
   gem.requirements               = []
-  gem.add_runtime_dependency     'rdf',             '~> 3.1', '>= 3.1.2'
-  gem.add_runtime_dependency     'rdf-vocab',       '~> 3.1', '>= 3.1.5'
+  gem.add_runtime_dependency     'rdf',             '~> 3.1', '>= 3.1.12'
   gem.add_runtime_dependency     'rdf-xsd',         '~> 3.1'
 
   gem.add_development_dependency 'rdf-spec',        '~> 3.1'
+  gem.add_development_dependency 'rdf-vocab',       '~> 3.1', '>= 3.1.10'
   gem.add_development_dependency 'rdf-turtle',      '~> 3.1'
   gem.add_development_dependency 'json-ld',         '~> 3.1'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
-  gem.add_development_dependency 'rspec',           '~> 3.9'
-  gem.add_development_dependency 'yard' ,           '~> 0.9.20'
+  gem.add_development_dependency 'rspec',           '~> 3.10'
+  gem.add_development_dependency 'yard' ,           '~> 0.9'
   gem.post_install_message       = nil
 end

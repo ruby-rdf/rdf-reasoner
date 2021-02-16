@@ -13,6 +13,20 @@ require 'rdf/turtle'
 require 'rdf/vocab'
 require 'rdf/xsd'
 
+begin
+  require 'simplecov'
+  require 'coveralls'
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
+    SimpleCov::Formatter::HTMLFormatter,
+    Coveralls::SimpleCov::Formatter
+  ])
+  SimpleCov.start do
+    add_filter "/spec/"
+  end
+  Coveralls.wear!
+rescue LoadError
+end
+
 ::RSpec.configure do |c|
   c.filter_run focus: true
   c.run_all_when_everything_filtered = true

@@ -34,15 +34,6 @@
   doap:maintainer    <https://greggkellogg.net/foaf#me> ;
   doap:documenter    <https://greggkellogg.net/foaf#me> ;
   foaf:maker         <https://greggkellogg.net/foaf#me> ;
-  dc:title           "RDF::Reasoner" ;
-  dc:description     """
-    Reasons over RDFS/OWL vocabularies to generate statements which are
-    entailed based on base RDFS/OWL rules along with vocabulary information. It
-    can also be used to ask specific questions, such as if a given object is
-    consistent with the vocabulary ruleset. This can be used to implement
-    SPARQL Entailment Regimes.
-  """@en ;
-  dc:date            "2014-06-01"^^xsd:date ;
   dc:creator         <https://greggkellogg.net/foaf#me> ;
   dc:isPartOf        <https://rubygems.org/gems/rdf> .
 

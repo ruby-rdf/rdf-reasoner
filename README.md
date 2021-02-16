@@ -1,4 +1,13 @@
-# rdf-reasoner
+# RDF::Reasoner
+
+A partial RDFS/OWL/schema.org reasoner for [RDF.rb][].
+
+[![Gem Version](https://badge.fury.io/rb/rdf-reasoner.png)](https://badge.fury.io/rb/rdf-reasoner)
+[![Build Status](https://github.com/ruby-rdf/rdf-reasoner/workflows/CI/badge.svg?branch=develop)](https://github.com/ruby-rdf/rdf-reasoner/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/ruby-rdf/rdf-reasoner/badge.svg?branch=develop)](https://coveralls.io/github/ruby-rdf/rdf-reasoner?branch=develop)
+[![Gitter chat](https://badges.gitter.im/ruby-rdf/rdf.png)](https://gitter.im/ruby-rdf/rdf)
+
+## Description
 
 Reasons over RDFS/OWL vocabularies and schema.org to generate statements which are entailed based on base RDFS/OWL rules along with vocabulary information. It can also be used to ask specific questions, such as if a given object is consistent with the vocabulary ruleset. This can be used to implement [SPARQL Entailment][] Regimes and [RDF Schema][] entailment.
 
@@ -136,7 +145,9 @@ The `rdf` command-line interface is extended with `entail` and `lint` commands. 
   list in the the `README`. Alphabetical order applies.
 * Do note that in order for us to merge any non-trivial changes (as a rule
   of thumb, additions larger than about 15 lines of code), we need an
-  explicit [public domain dedication][PDD] on record from you.
+  explicit [public domain dedication][PDD] on record from you,
+  which you will be asked to agree to on the first commit to a repo within the organization.
+  Note that the agreement applies to all repos in the [Ruby RDF](https://github.com/ruby-rdf/) organization.
 
 ## License
 
@@ -147,7 +158,7 @@ see <https://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [RDF]:              https://www.w3.org/RDF/
 [YARD]:             https://yardoc.org/
 [YARD-GS]:          https://rubydoc.info/docs/yard/file/docs/GettingStarted.md
-[PDD]:              https://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
+[PDD]:              https://unlicense.org/#unlicensing-contributions
 [SPARQL]:           https://en.wikipedia.org/wiki/SPARQL
 [SPARQL Query]:     https://www.w3.org/TR/2013/REC-sparql11-query-20130321/
 [SPARQL Entailment]:https://www.w3.org/TR/sparql11-entailment/
