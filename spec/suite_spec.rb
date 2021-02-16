@@ -30,6 +30,10 @@ describe RDF::Reasoner do
                    'datatypes-semantic-equivalence-within-type-2',
                    'datatypes-semantic-equivalence-between-datatypes'
                 pending "Datatype Entailment"
+              when *%w(rdfs-subPropertyOf-semantics-test001)
+                pending 'subProperty inheritance'
+              when *%w(tex-01-language-tag-case-1 tex-01-language-tag-case-2)
+                pending 'language tag case insensitivity'
               when 'datatypes-test008'
                 pending 'rdfD1'
               when /rdfms-seq/
