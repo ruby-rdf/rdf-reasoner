@@ -16,6 +16,14 @@ describe RDF::Reasoner::Schema do
         specify {expect(cls.domainIncludes.map(&:pname)).to include(*entails)}
       end
     end
+
+    {
+      RDF::Vocab::SCHEMAS.about => [RDF::Vocab::SCHEMAS.CreativeWork].map(&:pname),
+    }.each do |cls, entails|
+      describe cls.pname do
+        specify {expect(cls.properties[RDF::Vocab::SCHEMAS.domainIncludes].map(&:pname)).to include(*entails)}
+      end
+    end
   end
 
   describe :rangeIncludes do
@@ -28,13 +36,31 @@ describe RDF::Reasoner::Schema do
         specify {expect(cls.rangeIncludes.map(&:pname)).to include(*entails)}
       end
     end
+
+    {
+      RDF::Vocab::SCHEMAS.about => [RDF::Vocab::SCHEMAS.Thing].map(&:pname),
+      RDF::Vocab::SCHEMAS.event => [RDF::Vocab::SCHEMAS.Event].map(&:pname),
+    }.each do |cls, entails|
+      describe cls.pname do
+        specify {expect(Array(cls.properties[RDF::Vocab::SCHEMAS.rangeIncludes]).map(&:pname)).to include(*entails)}
+      end
+    end
   end
 
   describe :domain_compatible? do
-    let!(:queryable) {RDF::Graph.new << RDF::Statement(ex+"a", RDF.type, RDF::Vocab::SCHEMA.Person)}
+    let!(:queryable) {
+      RDF::Graph.new do |g|
+        g << RDF::Statement(ex+"a", RDF.type, RDF::Vocab::SCHEMA.Person)
+        g << RDF::Statement(ex+"a", RDF.type, RDF::Vocab::SCHEMAS.Person)
+      end
+    }
     context "domain and no provided types" do
       it "uses entailed types of resource" do
         expect(RDF::Vocab::SCHEMA.familyName).to be_domain_compatible(ex+"a", queryable)
+      end
+
+      it "uses entailed types of resource (https)" do
+        expect(RDF::Vocab::SCHEMAS.familyName).to be_domain_compatible(ex+"a", queryable)
       end
     end
 
@@ -42,9 +68,18 @@ describe RDF::Reasoner::Schema do
       expect(RDF::Vocab::SCHEMA.dateCreated).to be_domain_compatible(ex+"b", queryable)
     end
 
+    it "returns true with no domain and no type (https)" do
+      expect(RDF::Vocab::SCHEMAS.dateCreated).to be_domain_compatible(ex+"b", queryable)
+    end
+
     it "uses supplied types" do
       expect(RDF::Vocab::SCHEMA.dateCreated).not_to be_domain_compatible(ex+"a", queryable)
       expect(RDF::Vocab::SCHEMA.dateCreated).to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMA.CreativeWork])
+    end
+
+    it "uses supplied types (https)" do
+      expect(RDF::Vocab::SCHEMAS.dateCreated).not_to be_domain_compatible(ex+"a", queryable)
+      expect(RDF::Vocab::SCHEMAS.dateCreated).to be_domain_compatible(ex+"a", queryable, types: [RDF::Vocab::SCHEMAS.CreativeWork])
     end
 
     context "domain violations" do
@@ -52,6 +87,10 @@ describe RDF::Reasoner::Schema do
         "subject of wrong type" => %(
           @prefix schema: <http://schema.org/> .
           <foo> a schema:Person; schema:acceptedOffer [a schema:Offer] .
+        ),
+        "subject of wrong type (https)" => %(
+          @prefix schemas: <https://schema.org/> .
+          <foo> a schemas:Person; schemas:acceptedOffer [a schemas:Offer] .
         ),
       }.each do |name, input|
         it name do
@@ -116,6 +155,15 @@ describe RDF::Reasoner::Schema do
           statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
           expect(RDF::Vocabulary.find_term(statement.predicate)).to be_range_compatible(statement.object, graph)
         end
+
+        it "#{name.sub('schema:', 'schemas:')} (https)" do
+          input = input.
+            gsub('http://schema.org', 'https://schema.org').
+            gsub('schema:', 'schemas:')
+          graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
+          statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
+          expect(RDF::Vocabulary.find_term(statement.predicate)).to be_range_compatible(statement.object, graph)
+        end
       end
 
       context "ISO 8601" do
@@ -164,6 +212,7 @@ describe RDF::Reasoner::Schema do
         ).each do |date|
           it "recognizes #{date.sub('_', ' ')}" do
             expect(RDF::Vocab::SCHEMA.startDate).to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
+            expect(RDF::Vocab::SCHEMAS.startDate).to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
           end
         end
 
@@ -195,6 +244,7 @@ describe RDF::Reasoner::Schema do
         ).each do |date|
           it "does not recognize #{date.sub('_', ' ')}" do
             expect(RDF::Vocab::SCHEMA.startDate).not_to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
+            expect(RDF::Vocab::SCHEMAS.startDate).not_to be_range_compatible(RDF::Literal(date.sub('_', ' ')), [])
           end
         end
       end
@@ -224,6 +274,15 @@ describe RDF::Reasoner::Schema do
         ),
       }.each do |name, input|
         it name do
+          graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
+          statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
+          expect(RDF::Vocabulary.find_term(statement.predicate)).not_to be_range_compatible(statement.object, graph)
+        end
+
+        it "#{name.sub('schema:', 'schemas:')} (https)" do
+          input = input.
+            gsub('http://schema.org', 'https://schema.org').
+            gsub('schema:', 'schemas:')
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
           statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
           expect(RDF::Vocabulary.find_term(statement.predicate)).not_to be_range_compatible(statement.object, graph)
@@ -268,6 +327,15 @@ describe RDF::Reasoner::Schema do
         ),
       }.each do |name, input|
         it name do
+          graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
+          statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
+          expect(RDF::Vocabulary.find_term(statement.predicate)).not_to be_range_compatible(statement.object, graph)
+        end
+
+        it "#{name.sub('schema:', 'schemas:')} (https)" do
+          input = input.
+            gsub('http://schema.org', 'https://schema.org').
+            gsub('schema:', 'schemas:')
           graph = RDF::Graph.new << RDF::Turtle::Reader.new(input)
           statement = graph.to_a.reject {|s| s.predicate == RDF.type}.first
           expect(RDF::Vocabulary.find_term(statement.predicate)).not_to be_range_compatible(statement.object, graph)
@@ -428,6 +496,21 @@ describe RDF::Reasoner::Schema do
         predicate:  RDF::Vocab::SCHEMA.creator,
         result:     :range
       },
+      "Creator list (https)" => {
+        input: %(
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix schema: <https://schema.org/> .
+          <http://example/Review> a schema:Review;
+            schema:creator [
+              a rdf:List;
+              rdf:first [a schema:Person; schema:name "John Doe"];
+              rdf:rest rdf:nil
+            ] .
+        ),
+        resource:   RDF::URI("http://example/Review"),
+        predicate:  RDF::Vocab::SCHEMAS.creator,
+        result:     :range
+      },
       "Creator list with string value" => {
         input: %(
           @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -443,6 +526,21 @@ describe RDF::Reasoner::Schema do
         predicate:  RDF::Vocab::SCHEMA.creator,
         result:     :range
       },
+      "Creator list with string value (https)" => {
+        input: %(
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix schema: <https://schema.org/> .
+          <http://example/Review> a schema:Review;
+            schema:creator [
+              a rdf:List;
+              rdf:first "John Doe";
+              rdf:rest rdf:nil
+            ] .
+        ),
+        resource:   RDF::URI("http://example/Review"),
+        predicate:  RDF::Vocab::SCHEMAS.creator,
+        result:     :range
+      },
       "Creator list (single invalid value)" => {
         input: %(
           @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -456,6 +554,21 @@ describe RDF::Reasoner::Schema do
         ),
         resource:   RDF::URI("http://example/Review"),
         predicate:  RDF::Vocab::SCHEMA.creator,
+        result:     :not_range
+      },
+      "Creator list (single invalid value) (https)" => {
+        input: %(
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix schema: <https://schema.org/> .
+          <http://example/Review> a schema:Review;
+            schema:creator [
+              a rdf:List;
+              rdf:first [a schema:CreativeWork; schema:name "Website"];
+              rdf:rest rdf:nil
+            ] .
+        ),
+        resource:   RDF::URI("http://example/Review"),
+        predicate:  RDF::Vocab::SCHEMAS.creator,
         result:     :not_range
       },
       "Creator list (mixed valid/invalid)" => {
@@ -475,6 +588,25 @@ describe RDF::Reasoner::Schema do
         ),
         resource:   RDF::URI("http://example/Review"),
         predicate:  RDF::Vocab::SCHEMA.creator,
+        result:     :not_range
+      },
+      "Creator list (mixed valid/invalid) (https)" => {
+        input: %(
+          @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix schema: <https://schema.org/> .
+          <http://example/Review> a schema:Review;
+            schema:creator [
+              a rdf:List;
+              rdf:first [a schema:Person; schema:name "John Doe";];
+              rdf:rest [
+                a rdf:List;
+                rdf:first [a schema:CreativeWork; schema:name "Website"];
+                rdf:rest rdf:nil
+              ]
+            ] .
+        ),
+        resource:   RDF::URI("http://example/Review"),
+        predicate:  RDF::Vocab::SCHEMAS.creator,
         result:     :not_range
       },
     }.each do |name, params|

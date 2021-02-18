@@ -155,7 +155,7 @@ module RDF::Reasoner
           ).include?(resource) &&
           (ranges.include?(RDF::URI("http://schema.org/Boolean")) || ranges.include?(RDF::URI("https://schema.org/Boolean")))
           true # Special case for schema boolean resources
-        elsif (ranges.include?(RDF::URI("http://schema.org/URL")) || ranges.include?(RDF::URI("http://schema.org/URL"))) &&
+        elsif (ranges.include?(RDF::URI("http://schema.org/URL")) || ranges.include?(RDF::URI("https://schema.org/URL"))) &&
               resource.uri?
           true # schema:URL matches URI resources
         elsif ranges == [RDF::URI("http://schema.org/Text")] && resource.uri?
