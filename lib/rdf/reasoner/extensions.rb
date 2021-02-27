@@ -285,7 +285,9 @@ module RDF
           ((messages[:property] ||= {})[pname] ||= []) << if !term.domain.empty?
            "Subject #{show_resource(stmt.subject)} not compatible with domain (#{Array(term.domain).map {|d| d.pname|| d}.join(',')})"
           else
-            "Subject #{show_resource(stmt.subject)} not compatible with domainIncludes (#{term.domainIncludes.map {|d| d.pname|| d}.join(',')})"
+            domains = Array(term.domainIncludes) +
+                      Array(term.properties[:'https://schema.org/domainIncludes'])
+            "Subject #{show_resource(stmt.subject)} not compatible with domainIncludes (#{domains.map {|d| d.pname|| d}.join(',')})"
           end
         end
 
@@ -300,7 +302,9 @@ module RDF
           ((messages[:property] ||= {})[pname] ||= []) << if !term.range.empty?
            "Object #{show_resource(stmt.object)} not compatible with range (#{Array(term.range).map {|d| d.pname|| d}.join(',')})"
           else
-            "Object #{show_resource(stmt.object)} not compatible with rangeIncludes (#{term.rangeIncludes.map {|d| d.pname|| d}.join(',')})"
+            ranges = Array(term.rangeIncludes) +
+                      Array(term.properties[:'https://schema.org/rangeIncludes'])
+            "Object #{show_resource(stmt.object)} not compatible with rangeIncludes (#{ranges.map {|d| d.pname|| d}.join(',')})"
           end
         end
       end
