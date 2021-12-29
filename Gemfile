@@ -16,8 +16,8 @@ group :development, :test do
   gem "rdf-vocab",      github: "ruby-rdf/rdf-vocab",       branch: "develop"
   gem 'sxp',            github: "dryruby/sxp.rb",           branch: "develop"
   gem 'rake'
-  gem 'simplecov',      require: false
-  gem 'ruby-prof',      platform: :mri
+  gem 'simplecov', '~> 0.21',  platforms: :mri
+  gem 'simplecov-lcov', '~> 0.8',  platforms: :mri
 end
 
 group :debug do
