@@ -33,11 +33,11 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version      = '>= 3.0'
   gem.requirements               = []
   gem.add_runtime_dependency     'rdf',             '~> 3.3'
-  gem.add_runtime_dependency     'rdf-xsd',         '~> 3.2'
+  gem.add_runtime_dependency     'rdf-xsd',         '~> 3.3'
 
-  gem.add_development_dependency 'rdf-spec',        '~> 3.2'
-  gem.add_development_dependency 'rdf-vocab',       '~> 3.2'
-  gem.add_development_dependency 'rdf-turtle',      '~> 3.2'
+  gem.add_development_dependency 'rdf-spec',        '~> 3.3'
+  gem.add_development_dependency 'rdf-vocab',       '~> 3.3'
+  gem.add_development_dependency 'rdf-turtle',      '~> 3.3'
   gem.add_development_dependency 'json-ld',         '~> 3.3'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
   gem.add_development_dependency 'rspec',           '~> 3.12'
