@@ -9,6 +9,13 @@ Gem::Specification.new do |gem|
   gem.homepage           = "https://github.com/ruby-rdf/rdf-reasoner"
   gem.license            = 'Unlicense'
   gem.summary            = "RDFS/OWL Reasoner for RDF.rb"
+  gem.metadata           = {
+    "documentation_uri" => "https://ruby-rdf.github.io/rdf-reasoner",
+    "bug_tracker_uri"   => "https://github.com/ruby-rdf/rdf-reasoner/issues",
+    "homepage_uri"      => "https://github.com/ruby-rdf/rdf-reasoner",
+    "mailing_list_uri"  => "https://lists.w3.org/Archives/Public/public-rdf-ruby/",
+    "source_code_uri"   => "https://github.com/ruby-rdf/rdf-reasoner",
+  }
 
   gem.authors            = ['Gregg Kellogg']
   gem.email              = 'public-rdf-ruby@w3.org'
@@ -23,17 +30,17 @@ Gem::Specification.new do |gem|
                              the vocabulary ruleset. This can be used to implement
                              SPARQL Entailment Regimes.).gsub(/\s+/m, ' ')
 
-  gem.required_ruby_version      = '>= 2.6'
+  gem.required_ruby_version      = '>= 3.0'
   gem.requirements               = []
-  gem.add_runtime_dependency     'rdf',             '~> 3.2'
-  gem.add_runtime_dependency     'rdf-xsd',         '~> 3.2'
+  gem.add_runtime_dependency     'rdf',             '~> 3.3'
+  gem.add_runtime_dependency     'rdf-xsd',         '~> 3.3'
 
-  gem.add_development_dependency 'rdf-spec',        '~> 3.2'
-  gem.add_development_dependency 'rdf-vocab',       '~> 3.2'
-  gem.add_development_dependency 'rdf-turtle',      '~> 3.2'
-  gem.add_development_dependency 'json-ld',         '~> 3.2'
+  gem.add_development_dependency 'rdf-spec',        '~> 3.3'
+  gem.add_development_dependency 'rdf-vocab',       '~> 3.3'
+  gem.add_development_dependency 'rdf-turtle',      '~> 3.3'
+  gem.add_development_dependency 'json-ld',         '~> 3.3'
   gem.add_development_dependency 'equivalent-xml',  '~> 0.6'
-  gem.add_development_dependency 'rspec',           '~> 3.10'
+  gem.add_development_dependency 'rspec',           '~> 3.12'
   gem.add_development_dependency 'yard' ,           '~> 0.9'
   gem.post_install_message       = nil
 end

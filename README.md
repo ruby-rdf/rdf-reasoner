@@ -2,7 +2,7 @@
 
 A partial RDFS/OWL/schema.org reasoner for [RDF.rb][].
 
-[![Gem Version](https://badge.fury.io/rb/rdf-reasoner.png)](https://badge.fury.io/rb/rdf-reasoner)
+[![Gem Version](https://badge.fury.io/rb/rdf-reasoner.svg)](https://badge.fury.io/rb/rdf-reasoner)
 [![Build Status](https://github.com/ruby-rdf/rdf-reasoner/workflows/CI/badge.svg?branch=develop)](https://github.com/ruby-rdf/rdf-reasoner/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/ruby-rdf/rdf-reasoner/badge.svg?branch=develop)](https://coveralls.io/github/ruby-rdf/rdf-reasoner?branch=develop)
 [![Gitter chat](https://badges.gitter.im/ruby-rdf/rdf.png)](https://gitter.im/ruby-rdf/rdf)
@@ -121,8 +121,8 @@ The `rdf` command-line interface is extended with `entail` and `lint` commands. 
 
 ## Dependencies
 
-* [Ruby](https://ruby-lang.org/) (>= 2.6)
-* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.2)
+* [Ruby](https://ruby-lang.org/) (>= 3.0)
+* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.3)
 
 ## Mailing List
 
@@ -163,6 +163,6 @@ see <https://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [SPARQL Query]:     https://www.w3.org/TR/2013/REC-sparql11-query-20130321/
 [SPARQL Entailment]:https://www.w3.org/TR/sparql11-entailment/
 [RDF 1.1]:          https://www.w3.org/TR/rdf11-concepts
-[RDF.rb]:           https://www.rubydoc.info/github/ruby-rdf/rdf/
+[RDF.rb]:           https://ruby-rdf.github.io/rdf/
 [RDF Schema]:       https://www.w3.org/TR/rdf-schema/
 [Rack]:             https://rack.github.io/
